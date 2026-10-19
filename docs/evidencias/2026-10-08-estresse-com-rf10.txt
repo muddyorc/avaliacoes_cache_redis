@@ -1,0 +1,73 @@
+Teste de estresse com o monitoramento (RF10) ligado
+Data: 08/10/2026 — commit c198902
+Maquina: Windows 10, 12 nucleos, PostgreSQL 18.6 local, API e banco no mesmo computador
+API de teste: porta 3001, NODE_ENV=test, IA_PROVEDOR=simulado (sem chave)
+
+Saida literal das duas execucoes.
+
+=====================================================================
+$ NODE_ENV=test node scripts/estresse.js --alunos=30 --ciclos=6 --url=http://localhost:3001
+
+[estresse] banco de teste: postgresql://avaliacoes:***@localhost:5432/avaliacoes_teste
+[estresse] semeando 30 estudantes e uma prova de 10 questoes...
+[estresse] disparando todos os estudantes ao mesmo tempo...
+
+================ TESTE DE ESTRESSE ================
+Alunos simultaneos : 30
+Questoes da prova  : 10
+Salvamentos/aluno  : 6
+Duracao total      : 5.0 s
+Requisicoes        : 634 (127.9 req/s)
+Erros              : 0
+
+Operacao            Reqs   Erros   media     p50     p95     p99     max   (ms)
+--------------------------------------------------------------------------------
+login                 30       0    2790    2452    3602    3603    3603
+iniciar prova         30       0     915    1217    1327    1364    1364
+salvar respostas     180       0     100      98     126     131     141
+eventos de monitoramento 360       0      46      44      62      72      79
+entregar prova        30       0      64      68      92      94      94
+painel de correcao     1       0      14      14      14      14      14
+dashboard da avaliacao   1       0      13      13      13      13      13
+dashboard da turma     1       0       7       7       7       7       7
+relatorio de monitoramento   1       0       5       5       5       5       5
+====================================================
+
+=====================================================================
+$ NODE_ENV=test node scripts/estresse.js --alunos=60 --ciclos=10 --url=http://localhost:3001
+
+[estresse] banco de teste: postgresql://avaliacoes:***@localhost:5432/avaliacoes_teste
+[estresse] semeando 60 estudantes e uma prova de 10 questoes...
+[estresse] disparando todos os estudantes ao mesmo tempo...
+
+================ TESTE DE ESTRESSE ================
+Alunos simultaneos : 60
+Questoes da prova  : 10
+Salvamentos/aluno  : 10
+Duracao total      : 9.9 s
+Requisicoes        : 1984 (201.3 req/s)
+Erros              : 0
+
+Operacao            Reqs   Erros   media     p50     p95     p99     max   (ms)
+--------------------------------------------------------------------------------
+login                 60       0    6617    6672    6696    6700    6700
+iniciar prova         60       0     204     152     195    2942    2942
+salvar respostas     600       0     141     137     173     185     199
+eventos de monitoramento1200       0      72      73      95     106     109
+entregar prova        60       0     106     113     128     131     131
+painel de correcao     1       0      20      20      20      20      20
+dashboard da avaliacao   1       0      12      12      12      12      12
+dashboard da turma     1       0       8       8       8       8       8
+relatorio de monitoramento   1       0       7       7       7       7       7
+====================================================
+
+=====================================================================
+Conferencias feitas durante a execucao
+
+$ GET /api/correcao/ia/estado  (na instancia de teste, porta 3001)
+{"disponivel":true,"simulada":true,"provedor":"Simulado (sem chamada externa)","modelo":null}
+
+$ SELECT count(*) FROM evento_monitoramento;   (banco de teste)
+3060
+
+Nenhuma chamada a servico de IA foi feita em nenhuma das execucoes.

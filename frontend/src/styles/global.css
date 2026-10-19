@@ -1,0 +1,1177 @@
+/* CSS global: base do documento e camada de componentes do Design System.
+   As cores, sombras, raios, espaçamentos e tipografia vêm de `tokens.css` — nenhum
+   valor de cor é escrito aqui, para o tema claro/escuro trocar sem reescrever nada.
+   A identidade completa está documentada em FRONTEND_DESIGN_SYSTEM.md. */
+@import './tokens.css';
+@import './componentes.css';
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--fonte);
+  font-size: var(--texto-m);
+  line-height: 1.5;
+  color: var(--cor-texto);
+  background: var(--cor-fundo);
+  /* A troca de tema não pisca: só fundo e texto transitam. */
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.25;
+  color: var(--cor-titulo);
+}
+
+/* Foco sempre visível, e com a mesma aparência nos dois temas (acessibilidade). */
+:focus-visible {
+  outline: 2px solid var(--cor-primaria);
+  outline-offset: 2px;
+  border-radius: var(--raio-p);
+}
+
+/* ---------- Layout ---------- */
+.pagina {
+  max-width: var(--largura-conteudo);
+  margin: 0 auto;
+  padding: var(--esp-5) var(--esp-3);
+}
+
+/* O espaço até o conteúdo é do **cabeçalho**, e não do parágrafo dentro dele.
+   Era do parágrafo, e `.cabecalho-barra` o zerava para alinhar o botão à direita — com
+   isso o cabeçalho encostava no painel seguinte em todas as telas desse padrão. Em tela
+   larga passava despercebido, porque o bloco de texto é mais alto que o botão; abaixo de
+   ~800 px o botão quebra de linha e o defeito fica evidente. */
+.cabecalho {
+  margin-bottom: var(--esp-4);
+}
+
+.cabecalho h1 {
+  margin: 0;
+  font-size: var(--texto-gg);
+}
+
+.cabecalho p {
+  margin: var(--esp-1) 0 0;
+  color: var(--cor-texto-suave);
+}
+
+.painel {
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  padding: var(--esp-4);
+}
+
+/* ---------- Botões ---------- */
+.botao {
+  font: inherit;
+  font-weight: 600;
+  color: var(--cor-sobre-primaria);
+  background: var(--cor-primaria);
+  border: none;
+  border-radius: var(--raio);
+  padding: var(--esp-2) var(--esp-3);
+  min-height: 2.5rem;
+  cursor: pointer;
+}
+
+.botao:hover:not(:disabled) {
+  background: var(--cor-tinta-escura);
+}
+
+.botao:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.botao-secundario {
+  color: var(--cor-tinta);
+  background: transparent;
+  border: 1px solid var(--cor-borda);
+}
+
+.botao-secundario:hover:not(:disabled) {
+  background: var(--cor-superficie-alt);
+}
+
+.botao-bloco {
+  width: 100%;
+  margin-top: var(--esp-2);
+}
+
+/* ---------- Formulários (Etapa 1) ---------- */
+.pagina-estreita {
+  max-width: 24rem;
+}
+
+.cabecalho-barra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-3);
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.campo {
+  margin-bottom: var(--esp-3);
+}
+
+.campo label {
+  display: block;
+  margin-bottom: var(--esp-1);
+  font-size: var(--texto-p);
+  font-weight: 600;
+}
+
+.campo input {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  padding: var(--esp-2);
+  min-height: 2.5rem;
+}
+
+.campo input[aria-invalid='true'] {
+  border-color: var(--cor-erro);
+}
+
+/* Campo com um botão por dentro — hoje, só o "mostrar senha".
+   O recuo à direita do input existe para o texto digitado não passar por baixo do ícone:
+   uma senha longa encostaria nele. */
+.campo-com-acao {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.campo-com-acao input {
+  padding-right: 2.75rem;
+}
+
+.campo-acao {
+  position: absolute;
+  right: var(--esp-1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--raio-p);
+  background: none;
+  color: var(--cor-texto-suave);
+  cursor: pointer;
+}
+
+.campo-acao:hover {
+  color: var(--cor-texto);
+  background: var(--cor-superficie-alt);
+}
+
+.campo-acao:focus-visible {
+  outline: none;
+  box-shadow: var(--foco-anel);
+}
+
+.campo-dica,
+.campo-erro {
+  margin: var(--esp-1) 0 0;
+  font-size: var(--texto-p);
+}
+
+.campo-dica {
+  color: var(--cor-texto-suave);
+}
+
+.campo-erro {
+  color: var(--cor-erro);
+}
+
+/* ---------- Avisos ---------- */
+.aviso {
+  margin: 0 0 var(--esp-3);
+  border: 1px solid;
+  border-radius: var(--raio);
+  padding: var(--esp-2) var(--esp-3);
+  font-size: var(--texto-p);
+}
+
+.aviso-erro {
+  color: var(--cor-erro);
+  border-color: var(--cor-erro-borda);
+  background: var(--cor-erro-fundo);
+}
+
+.aviso-sucesso {
+  color: var(--cor-sucesso);
+  border-color: var(--cor-sucesso-borda);
+  background: var(--cor-sucesso-fundo);
+}
+
+.carregando {
+  color: var(--cor-texto-suave);
+}
+
+.texto-suave {
+  color: var(--cor-texto-suave);
+}
+
+.etiqueta-ok {
+  color: var(--cor-sucesso);
+  font-size: var(--texto-p);
+  font-weight: 600;
+}
+
+.lista-simples {
+  margin: 0;
+  padding-left: var(--esp-4);
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-p);
+}
+
+.rodape-form {
+  margin: var(--esp-3) 0 0;
+  font-size: var(--texto-p);
+}
+
+.botao-pequeno {
+  min-height: 2rem;
+  padding: var(--esp-1) var(--esp-2);
+  font-size: var(--texto-p);
+}
+
+/* Link estilizado como botão precisa do alinhamento que o <button> tem por padrão. */
+a.botao {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+/* ---------- Gestão de usuários (Etapa 2) ---------- */
+.pagina-larga {
+  max-width: 64rem;
+}
+
+.campo select {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  padding: var(--esp-2);
+  min-height: 2.5rem;
+}
+
+.campo select:disabled {
+  background: var(--cor-fundo);
+  color: var(--cor-texto-suave);
+}
+
+.barra-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+  align-items: center;
+  margin-bottom: var(--esp-3);
+}
+
+.espaco-acima {
+  margin-top: var(--esp-4);
+}
+
+/* Filtros em grade fluida: viram uma coluna só em telas estreitas. */
+.filtros {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--esp-3);
+  align-items: end;
+  margin-bottom: var(--esp-3);
+  padding-bottom: var(--esp-3);
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.filtros .campo {
+  margin-bottom: 0;
+}
+
+/* A tabela é o único elemento que pode rolar na horizontal (RNF05). */
+.tabela-rolavel {
+  overflow-x: auto;
+}
+
+/* Quadro largo: a primeira coluna acompanha a rolagem horizontal.
+   No quadro de resultados as colunas são as avaliações da turma, e com quatro ou mais
+   delas o nome do estudante sairia da tela — o professor leria uma linha de notas sem
+   saber de quem é. O fundo próprio é obrigatório: sem ele, o conteúdo rolaria por baixo. */
+.tabela-coluna-fixa thead th:first-child,
+.tabela-coluna-fixa tbody th:first-child {
+  position: sticky;
+  left: 0;
+  background: var(--cor-superficie);
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--texto-p);
+}
+
+.tabela th,
+.tabela td {
+  text-align: left;
+  padding: var(--esp-2);
+  border-bottom: 1px solid var(--cor-borda);
+  vertical-align: top;
+}
+
+.tabela th {
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-p);
+  white-space: nowrap;
+}
+
+.tabela .quebra {
+  overflow-wrap: anywhere;
+}
+
+/* Link que não quer parecer link: usado na célula de nota do quadro de resultados, onde
+   o conteúdo é o número e a navegação é secundária. Dezenas de notas sublinhadas e
+   coloridas viram ruído e escondem o que a tabela quer mostrar. O sublinhado aparece no
+   ponteiro e no foco — quem navega pelo teclado precisa saber que ali se clica. */
+.ligacao-discreta {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ligacao-discreta:hover,
+.ligacao-discreta:focus-visible {
+  text-decoration: underline;
+}
+
+.tabela .acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-1);
+}
+
+.situacao-ativa {
+  color: var(--cor-sucesso);
+  font-weight: 600;
+}
+
+.situacao-inativa {
+  color: var(--cor-texto-suave);
+  font-weight: 600;
+}
+
+.etiqueta {
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-p);
+}
+
+.paginacao {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-3);
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--esp-3);
+  font-size: var(--texto-p);
+}
+
+.lista-atalhos {
+  margin: 0 0 var(--esp-3);
+  padding-left: var(--esp-4);
+}
+
+/* Visível apenas para leitores de tela: dá contexto à tabela sem poluir a página. */
+.apenas-leitor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Banco de questões (Etapa 3) ---------- */
+.campo textarea {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  padding: var(--esp-2);
+  resize: vertical;
+}
+
+.campo textarea[aria-invalid='true'] {
+  border-color: var(--cor-erro);
+}
+
+/* Tema e pontuação lado a lado; empilham em telas estreitas. */
+.linha-campos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0 var(--esp-3);
+}
+
+fieldset {
+  margin: 0 0 var(--esp-3);
+  padding: 0;
+  border: none;
+  min-width: 0; /* sem isto, fieldset não encolhe em telas estreitas */
+}
+
+legend {
+  margin-bottom: var(--esp-1);
+  padding: 0;
+  font-size: var(--texto-p);
+  font-weight: 600;
+}
+
+.grupo-opcoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2) var(--esp-4);
+}
+
+.grupo-opcoes legend {
+  width: 100%;
+}
+
+.alternativa {
+  display: flex;
+  gap: var(--esp-2);
+  align-items: flex-start;
+  margin-bottom: var(--esp-2);
+  padding: var(--esp-2);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+}
+
+.alternativa-correta {
+  border-color: var(--cor-sucesso-borda);
+  background: var(--cor-sucesso-fundo);
+}
+
+.alternativa-marcador {
+  display: flex;
+  gap: var(--esp-1);
+  align-items: center;
+  min-height: 2.5rem;
+  font-weight: 600;
+}
+
+.alternativa-texto {
+  flex: 1;
+  min-width: 0;
+}
+
+.alternativa-texto input {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  padding: var(--esp-2);
+  min-height: 2.5rem;
+}
+
+.alternativa-texto input[aria-invalid='true'] {
+  border-color: var(--cor-erro);
+}
+
+.alternativa .botao {
+  margin-top: 0.25rem;
+}
+
+.lista-questoes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cartao-questao {
+  padding: var(--esp-3) 0;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.cartao-questao:first-child {
+  padding-top: 0;
+}
+
+.cartao-inativo .cartao-enunciado {
+  color: var(--cor-texto-suave);
+}
+
+.cartao-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+  align-items: center;
+  font-size: var(--texto-p);
+}
+
+.selo {
+  display: inline-block;
+  padding: 0 var(--esp-2);
+  border-radius: 999px;
+  background: var(--cor-primaria);
+  color: var(--cor-sobre-primaria);
+  font-size: var(--texto-p);
+  font-weight: 600;
+}
+
+.selo-neutro {
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
+  border: 1px solid var(--cor-borda);
+}
+
+/* Enunciados longos: três linhas na lista; o texto completo aparece na edição. */
+.cartao-enunciado {
+  margin: var(--esp-2) 0;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Respiro nos dois lados: a linha fica entre o botão de alternativas e a fileira de
+   ações, e sem folga ela se cola nos dois e parece parte de um deles. */
+.cartao-uso {
+  margin: var(--esp-2) 0;
+  font-size: var(--texto-p);
+}
+
+.cartao-aviso {
+  margin: 0 0 var(--esp-2);
+  color: var(--cor-alerta);
+  font-size: var(--texto-p);
+}
+
+.cartao-questao .acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-1);
+}
+
+/* ---------- Avaliações (Etapa 4) ---------- */
+.selo-status-rascunho {
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
+  border: 1px solid var(--cor-borda);
+}
+
+.selo-status-publicada {
+  background: var(--cor-sucesso);
+}
+
+.selo-status-arquivada {
+  background: var(--cor-texto-suave);
+}
+
+.aviso-alerta {
+  color: var(--cor-alerta);
+  border-color: var(--cor-alerta-borda);
+  background: var(--cor-alerta-fundo);
+}
+
+.sem-margem {
+  margin: 0;
+}
+
+.sem-borda {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.espaco-acima-pequeno {
+  margin-top: var(--esp-3);
+}
+
+/* Para o rótulo que precisa respirar mais que o padrão do formulário — sem mexer no
+   `.campo label`, que vale para a aplicação inteira.
+   A folga maior que o padrão existe porque o campo focado desenha um anel por FORA da
+   borda: com o espaço mínimo, esse anel encosta no rótulo justo ao ser usado.
+
+   `.campo label.espaco-abaixo`, e não só `.espaco-abaixo`: `.campo label` é classe mais
+   elemento, mais específico que uma classe sozinha — a regra curta perdia em silêncio,
+   e aumentar o valor dela não mudava nada na tela. */
+.campo label.espaco-abaixo {
+  margin-bottom: var(--esp-3);
+}
+
+.campo-marcador label {
+  display: flex;
+  gap: var(--esp-2);
+  align-items: center;
+  font-weight: 600;
+}
+
+/* A regra geral de `.campo input` (largura 100%, altura mínima) esticaria a caixa. */
+.campo-marcador input[type='checkbox'] {
+  width: 1.1rem;
+  height: 1.1rem;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  flex: none;
+}
+
+.cartao-titulo {
+  margin: var(--esp-2) 0 var(--esp-1);
+  font-size: var(--texto-m);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.abas {
+  display: flex;
+  gap: var(--esp-1);
+  margin-bottom: var(--esp-3);
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.aba {
+  font: inherit;
+  font-weight: 600;
+  color: var(--cor-texto-suave);
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: var(--esp-2) var(--esp-3);
+  cursor: pointer;
+}
+
+.aba-ativa {
+  color: var(--cor-tinta);
+  border-bottom-color: var(--cor-tinta);
+}
+
+.lista-itens {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Cada questão da avaliação: número, conteúdo e controles; empilha no celular. */
+.item-avaliacao {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr) auto;
+  gap: var(--esp-2) var(--esp-3);
+  align-items: start;
+  padding: var(--esp-3) 0;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.item-ordem {
+  font-weight: 700;
+  color: var(--cor-tinta);
+  font-size: var(--texto-g);
+}
+
+.item-controles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  align-items: flex-end;
+}
+
+.item-pontuacao {
+  display: flex;
+  gap: var(--esp-2);
+  align-items: center;
+  font-size: var(--texto-p);
+  font-weight: 600;
+}
+
+.item-pontuacao input {
+  width: 5rem;
+  font: inherit;
+  color: inherit;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  padding: var(--esp-1) var(--esp-2);
+  min-height: 2rem;
+}
+
+.item-pontuacao input[aria-invalid='true'] {
+  border-color: var(--cor-erro);
+}
+
+@media (max-width: 40rem) {
+  .item-avaliacao {
+    grid-template-columns: 2rem minmax(0, 1fr);
+  }
+
+  .item-controles {
+    grid-column: 2;
+    align-items: flex-start;
+  }
+}
+
+.seletor-banco {
+  margin-top: var(--esp-4);
+  padding-top: var(--esp-3);
+  border-top: 1px solid var(--cor-borda);
+}
+
+.lista-banco {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* `> li`, e não `li`: o seletor sem o filho direto alcançava também os <li> DAS
+   ALTERNATIVAS, aninhados aqui dentro desde que a busca passou a exibi-las. Eles herdavam
+   `justify-content: space-between` e o texto de cada alternativa ia para a borda direita,
+   separado da sua letra. */
+.lista-banco > li {
+  display: flex;
+  gap: var(--esp-3);
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--esp-2) 0;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.lista-banco > li > div {
+  min-width: 0;
+}
+
+.lista-banco .cartao-enunciado {
+  margin: var(--esp-1) 0 0;
+  -webkit-line-clamp: 2;
+}
+
+/* ---------- Ajustes pós-Etapa 4: visibilidade, questão na prova, teste ---------- */
+.grupo-visibilidade {
+  margin-bottom: var(--esp-3);
+}
+
+.opcao-descrita {
+  display: flex;
+  gap: var(--esp-2);
+  align-items: flex-start;
+  margin-bottom: var(--esp-2);
+  font-size: var(--texto-p);
+}
+
+.opcao-descrita input {
+  margin-top: 0.2rem;
+  flex: none;
+}
+
+.bloco-criar-questao,
+.bloco-teste {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2) var(--esp-3);
+  align-items: center;
+  justify-content: space-between;
+  margin: var(--esp-3) 0;
+  padding: var(--esp-3);
+  border: 1px dashed var(--cor-borda);
+  border-radius: var(--raio);
+}
+
+a.botao-inativo {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.faixa-teste {
+  margin-bottom: var(--esp-3);
+}
+
+.instrucoes {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+/* Barra fixa no topo durante o teste: título e cronômetro sempre visíveis. */
+.barra-prova {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2) var(--esp-3);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--esp-3);
+  padding: var(--esp-2) var(--esp-3);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+}
+
+.barra-prova-titulo {
+  margin: 0;
+  font-size: var(--texto-m);
+  overflow-wrap: anywhere;
+}
+
+.cronometro {
+  margin: 0;
+  font-size: var(--texto-g);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--cor-tinta);
+}
+
+.cronometro-alerta {
+  color: var(--cor-erro);
+}
+
+.questao-prova {
+  margin: 0 0 var(--esp-3);
+  padding: var(--esp-4);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+}
+
+.questao-prova-cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+  justify-content: space-between;
+  width: 100%;
+  margin: 0;
+  font-weight: 700;
+  font-size: var(--texto-p);
+}
+
+/* O legend não se estica como um bloco comum: o float o põe dentro da caixa. */
+.questao-prova > legend {
+  float: left;
+  margin-bottom: var(--esp-2);
+}
+
+.questao-prova-enunciado {
+  clear: both;
+  margin: 0 0 var(--esp-3);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.questao-prova-alternativas {
+  display: grid;
+  gap: var(--esp-2);
+}
+
+.opcao-prova {
+  display: flex;
+  gap: var(--esp-2);
+  align-items: flex-start;
+  padding: var(--esp-2) var(--esp-3);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.opcao-prova input {
+  margin-top: 0.25rem;
+  flex: none;
+}
+
+.opcao-prova-marcada {
+  border-color: var(--cor-primaria);
+  background: var(--cor-primaria-suave);
+}
+
+.opcao-prova-letra {
+  font-weight: 700;
+  color: var(--cor-tinta);
+}
+
+.placar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-3) var(--esp-5);
+}
+
+.placar-numero {
+  margin: 0;
+  font-size: var(--texto-g);
+  font-weight: 700;
+}
+
+.texto-erro {
+  color: var(--cor-erro);
+  font-weight: 600;
+}
+
+.resultado-questao .questao-prova-enunciado {
+  margin-top: var(--esp-2);
+}
+
+.alternativas-resultado {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--esp-1);
+}
+
+.alternativas-resultado li {
+  padding: var(--esp-2) var(--esp-3);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  overflow-wrap: anywhere;
+}
+
+.alternativas-resultado .alternativa-certa {
+  border-color: var(--cor-sucesso-borda);
+  background: var(--cor-sucesso-fundo);
+}
+
+.alternativas-resultado .alternativa-errada {
+  border-color: var(--cor-erro-borda);
+  background: var(--cor-erro-fundo);
+}
+
+.comparacao-discursiva {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--esp-3);
+}
+
+.comparacao-discursiva h3 {
+  margin: 0 0 var(--esp-1);
+  font-size: var(--texto-p);
+}
+
+/* ---------- Turmas (Etapa 5) ---------- */
+.selo-alerta {
+  background: var(--cor-alerta);
+}
+
+.codigo-turma {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2) var(--esp-3);
+  align-items: center;
+}
+
+.codigo-turma-valor {
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  font-size: var(--texto-g);
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--cor-tinta-escura);
+  background: var(--cor-fundo);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  padding: var(--esp-1) var(--esp-2);
+  user-select: all; /* um clique seleciona o código inteiro, se copiar não funcionar */
+}
+
+.codigo-turma-compacto .codigo-turma-valor {
+  font-size: var(--texto-m);
+}
+
+.lista-pessoas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.lista-pessoas li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2) var(--esp-3);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--esp-2) 0;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.lista-pessoas li > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.lista-pessoas .acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-1);
+}
+
+details summary {
+  cursor: pointer;
+  font-size: var(--texto-p);
+  font-weight: 600;
+  color: var(--cor-texto-suave);
+}
+
+/* Campo do código e botão Entrar na mesma linha; empilham no celular. */
+.linha-entrada {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--esp-3);
+  align-items: flex-start;
+}
+
+.linha-entrada .campo {
+  flex: 1 1 14rem;
+}
+
+.linha-entrada .botao {
+  margin-top: 1.6rem;
+}
+
+.lista-marcacao {
+  margin-bottom: var(--esp-3);
+}
+
+.conferencia {
+  margin-top: var(--esp-2);
+}
+
+/* ---------- Realização da prova (Etapa 6) ---------- */
+/* Indicação de salvamento do UC09: discreta, mas sempre visível durante a prova. */
+.estado-salvamento {
+  margin: 0 0 var(--esp-3);
+  padding: var(--esp-1) var(--esp-2);
+  font-size: var(--texto-p);
+  color: var(--cor-texto-suave);
+}
+
+.estado-salvamento-falha {
+  color: var(--cor-alerta);
+  background: var(--cor-alerta-fundo);
+  border: 1px solid var(--cor-alerta-borda);
+  border-radius: var(--raio);
+  padding: var(--esp-2) var(--esp-3);
+}
+
+/* ---------- Correção e nota (Etapa 7) ---------- */
+.nota-liberada {
+  margin: var(--esp-2) 0;
+  font-size: var(--texto-m);
+  color: var(--cor-sucesso);
+}
+
+/* ---------- Diagnóstico (Etapa 0) ---------- */
+.status-lista {
+  list-style: none;
+  margin: 0 0 var(--esp-4);
+  padding: 0;
+}
+
+.status-linha {
+  display: flex;
+  gap: var(--esp-3);
+  align-items: flex-start;
+  padding: var(--esp-3) 0;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.status-linha:first-child {
+  padding-top: 0;
+}
+
+.status-indicador {
+  flex: none;
+  width: 0.75rem;
+  height: 0.75rem;
+  margin-top: 0.4rem;
+  border-radius: 50%;
+}
+
+.status-ok { background: var(--cor-sucesso); }
+.status-falha { background: var(--cor-erro); }
+.status-verificando { background: var(--cor-alerta); }
+
+.status-rotulo {
+  margin-left: var(--esp-2);
+  font-size: var(--texto-p);
+  color: var(--cor-texto-suave);
+}
+
+.status-detalhe {
+  margin: var(--esp-1) 0 0;
+  font-size: var(--texto-p);
+  color: var(--cor-texto-suave);
+  overflow-wrap: anywhere;
+}
+
+/* Dashboard de desempenho (RF12) ----------------------------------------- */
+
+.grafico {
+  margin: var(--esp-3) 0;
+  /* O gráfico respira dentro do painel e nunca empurra a página na horizontal. */
+  width: 100%;
+}
+
+.grafico-dica {
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  padding: var(--esp-2);
+  font-size: var(--texto-p);
+  box-shadow: var(--sombra-2);
+  max-width: 18rem;
+}
+
+.colunas-destaque {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--esp-3) var(--esp-4);
+}
+
+.lista-destaque {
+  margin: 0;
+  padding-left: var(--esp-3);
+}
+
+.lista-destaque li {
+  margin-bottom: var(--esp-2);
+}
+
+/* Publicar ao lado das abas ---------------------------------------------- */
+/* Fica na mesma barra das abas, mas NUNCA com cara de aba: aba troca a vista e nada
+   acontece; publicar muda o estado da avaliação. A forma do elemento é a mensagem.
+   Empurrado para a direita, separado do grupo de navegação. */
+.botao-publicar-barra {
+  margin-left: auto;
+  align-self: center;
+}
+
+/* O menu de ações da avaliação, no fim da barra de abas. O `margin-left: auto` precisa
+   estar nele também, e não só no botão Publicar: a avaliação já publicada não tem aquele
+   botão, e sem isto o menu encostaria na última aba. */
+.abas > .menu-acoes {
+  margin-left: auto;
+  align-self: center;
+}
+
+/* Com o Publicar presente, quem empurra é ele — aqui basta o respiro entre os dois.
+   A regra vem depois da de cima, de mesma especificidade, e por isso vence. */
+.botao-publicar-barra + .menu-acoes {
+  margin-left: var(--esp-2);
+}

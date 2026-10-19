@@ -1,0 +1,62 @@
+# Publicação no Render — um serviço web e um banco.
+#
+# Por que UM serviço, e não um site estático mais uma API: o cookie de sessão é
+# `SameSite=Strict` (CSRF). Em origens diferentes o navegador simplesmente não o envia —
+# o login responderia 200 e a requisição seguinte chegaria sem sessão, o que parece
+# defeito aleatório. O Express serve o build do Vite, e tudo fica na mesma origem (DT04).
+#
+# Como usar: no Render, New → Blueprint, apontando para este repositório. O que estiver
+# marcado com `sync: false` é pedido na hora — são segredos, e não moram no repositório.
+
+services:
+  - type: web
+    name: avaliune
+    runtime: node
+    plan: free
+    # O plano gratuito hiberna após 15 minutos sem uso e leva cerca de um minuto para
+    # acordar. Para uma demonstração marcada, vale abrir o endereço alguns minutos antes.
+    buildCommand: npm run build
+    # Antes de a aplicação subir: migrações (o esquema precisa existir quando a primeira
+    # requisição chegar) e o seed, que cria o administrador inicial — sem ele não haveria
+    # como entrar no sistema, já que professor não tem autocadastro (P-18). Os dois são
+    # idempotentes: repetir a cada publicação não causa dano.
+    startCommand: npm start
+    healthCheckPath: /api/saude
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      - key: DATABASE_URL
+        fromDatabase:
+          name: avaliune-banco
+          property: connectionString
+
+      # Gerado pelo Render: ninguém precisa inventar — nem guardar — esse valor.
+      - key: JWT_SECRET
+        generateValue: true
+
+      # O administrador inicial, criado pelo seed na primeira subida.
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_SENHA
+        sync: false
+
+      # Correção assistida desligada por padrão. Com uma chave configurada, qualquer prova
+      # aberta na tela de correção consome crédito — inclusive de quem encontrar o
+      # endereço. Ligue só quando for demonstrar, trocando para openai/gemini/anthropic e
+      # preenchendo IA_API_KEY.
+      - key: IA_PROVEDOR
+        value: simulado
+
+      # Usado nos links do e-mail de recuperação de senha. Ajuste para o endereço real do
+      # serviço depois da primeira publicação.
+      - key: FRONTEND_URL
+        sync: false
+
+databases:
+  - name: avaliune-banco
+    plan: free
+    # ATENÇÃO: o banco gratuito do Render tem prazo de validade, mostrado na criação.
+    # Se ele vencer antes da entrega, o banco é apagado. Confira a data antes de confiar.
+    databaseName: avaliacoes
+    user: avaliacoes

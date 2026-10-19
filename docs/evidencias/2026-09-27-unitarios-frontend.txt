@@ -1,0 +1,29 @@
+Data da execucao: 2026-09-27T21:36:15.613Z
+Node v24.21.0
+1930470 Interface do Design System, congelamento das questoes (P-22), divulgacao dos resultados (P-23) e saida da turma (P-24)
+
+
+> avaliacoes-frontend@0.1.0 test
+> node --test "tests/*.test.js"
+
+✔ ida e volta entre a API e o campo preserva o instante (3.1225ms)
+✔ o campo recebe o formato que o navegador espera, sem segundos nem fuso (0.429ms)
+✔ campo vazio continua vazio nos dois sentidos (0.2683ms)
+✔ data digitada de forma inválida não vira "Invalid Date" no corpo da requisição (0.242ms)
+✔ a duração aparece em horas e minutos (0.3149ms)
+✔ duração de uma hora exata não mostra "1 h 0 min" (0.2188ms)
+✔ a pontuação concorda em número: 1 ponto, 2 pontos (40.8792ms)
+✔ nota fracionada usa vírgula, como se escreve em português (0.5096ms)
+✔ usa o primeiro nome de quem está na tela (1.7792ms)
+✔ o tratamento não é nome: "Prof. Rita" cumprimenta Rita (0.2443ms)
+✔ a preposição também não é nome: "Professor de Teste" não vira "de" (0.2436ms)
+✔ quem só tem tratamento no cadastro é cumprimentado assim mesmo (1.2481ms)
+✔ espaços sobrando e nome ausente não quebram a tela (0.2307ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 219.0419

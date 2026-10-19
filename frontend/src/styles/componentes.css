@@ -1,0 +1,1538 @@
+/* Design System — componentes reutilizáveis (FRONTEND_DESIGN_SYSTEM.md).
+ *
+ * Nada aqui conhece uma tela específica: são peças genéricas (estrutura, cartão,
+ * navegação, estados) que as telas montam. Toda cor vem de `tokens.css`, então o
+ * modo escuro funciona sem nenhuma regra duplicada.
+ */
+
+/* ---------------------------------------------------------------- ícones */
+.icone {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* -------------------------------------------------------- botão de ícone */
+.botao-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--cor-texto-suave);
+  background: transparent;
+  border: none;
+  border-radius: var(--raio-completo);
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.botao-icone:hover {
+  color: var(--cor-texto);
+  background: var(--cor-superficie-alt);
+}
+
+.botao-icone svg {
+  width: 1.375rem;
+  height: 1.375rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ------------------------------------------------ estrutura da aplicação */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--cor-fundo);
+}
+
+.app-topo {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  height: var(--topo-altura);
+  padding: 0 var(--esp-3);
+  background: var(--cor-superficie);
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  color: var(--cor-titulo);
+  text-decoration: none;
+  font-weight: var(--peso-forte);
+  font-size: var(--texto-g);
+}
+
+/* Fora da sessão não há barra superior, então a marca aparece acima do título da tela.
+   Um pouco maior que no cabeçalho: aqui ela é a apresentação do sistema, e não um
+   elemento de navegação. */
+.marca-publica {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--esp-4);
+}
+
+.marca-publica .marca-logo {
+  width: 14rem;
+  height: 2rem;
+}
+
+/* O logo entra como **máscara**, não como `<img>`.
+ *
+ * O arquivo é de uma cor só, num azul escuro que tem ótimo contraste sobre branco e
+ * praticamente some sobre a superfície do modo noturno. Como máscara, o desenho vira
+ * recorte e quem dá a cor é o `background` — que aponta para a cor da marca do tema em
+ * uso. Um arquivo, dois temas, contraste garantido nos dois.
+ *
+ * A proporção do desenho é 7:1, então a largura acompanha a altura. */
+.marca-logo {
+  display: block;
+  width: 12.25rem;
+  height: 1.75rem;
+  background-color: var(--cor-primaria);
+  -webkit-mask: url('/logo.png') no-repeat center / contain;
+  mask: url('/logo.png') no-repeat center / contain;
+}
+
+.app-topo-acoes {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-1);
+  margin-left: auto;
+}
+
+/* ------------------------------------------------------- menu da conta */
+.menu-usuario {
+  position: relative;
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  font: inherit;
+  font-size: var(--texto-p);
+  font-weight: var(--peso-forte);
+  color: var(--cor-sobre-primaria);
+  background: var(--cor-primaria);
+  border: none;
+  border-radius: var(--raio-completo);
+  cursor: pointer;
+}
+
+.menu-flutuante {
+  position: absolute;
+  right: 0;
+  top: calc(100% + var(--esp-2));
+  min-width: 15rem;
+  padding: var(--esp-2);
+  background: var(--cor-superficie-elevada);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-m);
+  box-shadow: var(--sombra-2);
+}
+
+/* Capa com ação no canto: o menu da turma fica alinhado ao topo, longe do texto. */
+/* `.capa.capa-com-acoes`, e não só `.capa-com-acoes`: `.capa` é declarada mais abaixo
+   neste arquivo e também define `flex-direction`. Com a mesma especificidade, quem vem
+   depois vence — e a capa voltava a empilhar em coluna, jogando o menu de ações para
+   baixo do texto, à esquerda. Duas classes no seletor resolvem independentemente da
+   ordem em que as regras aparecem.
+   `flex-end` alinha o menu pela base do bloco de texto: a capa tem altura mínima e o
+   conteúdo mora embaixo, então é lá que a linha de fato está. */
+.capa.capa-com-acoes {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--esp-3);
+}
+
+/* Só o bloco de texto: o menu de ações também é uma div filha, e não é coluna. */
+.capa-com-acoes > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+  min-width: 0;
+}
+
+/* Na capa colorida, o botão herda a cor do texto sobre ela. */
+.capa-com-acoes .botao-icone {
+  color: var(--cor-sobre-capa);
+}
+
+/* Selo e ações lado a lado, na ponta direita do item de lista. */
+.item-acoes {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+}
+
+/* Ancora o menu ao botão de três pontos do cartão. */
+.menu-acoes {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Menu curto, do tamanho das ações que carrega. */
+.menu-flutuante-fim {
+  min-width: 12rem;
+  z-index: 15;
+}
+
+/* Aberto para cima: usado quando não cabe abaixo do botão. */
+.menu-flutuante-acima {
+  top: auto;
+  bottom: calc(100% + var(--esp-2));
+}
+
+.menu-cabecalho {
+  padding: var(--esp-2);
+  border-bottom: 1px solid var(--cor-borda);
+  margin-bottom: var(--esp-1);
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  width: 100%;
+  padding: var(--esp-2);
+  font: inherit;
+  text-align: left;
+  color: var(--cor-texto);
+  text-decoration: none;
+  background: none;
+  border: none;
+  border-radius: var(--raio-p);
+  cursor: pointer;
+}
+
+.menu-item:hover:not(:disabled) {
+  background: var(--cor-superficie-alt);
+}
+
+.etiqueta {
+  display: inline-block;
+  margin-top: var(--esp-1);
+  padding: 0 var(--esp-2);
+  font-size: var(--texto-pp);
+  font-weight: var(--peso-forte);
+  color: var(--cor-primaria);
+  background: var(--cor-primaria-suave);
+  border-radius: var(--raio-completo);
+}
+
+/* --------------------------------------------- corpo: lateral + conteúdo */
+.app-corpo {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* A lateral é um **trilho**: em repouso mostra só os ícones e, ao receber o ponteiro
+   (ou o foco do teclado), abre por cima do conteúdo com os nomes. Quem já conhece o
+   sistema navega pelos ícones sem perder largura de tela; quem não conhece encosta o
+   mouse e lê. O elemento do fluxo reserva apenas a faixa estreita, então abrir a
+   lateral não empurra nem recalcula o conteúdo. */
+.app-lateral {
+  flex: none;
+  width: var(--lateral-recolhida);
+}
+
+.nav-lista {
+  position: fixed;
+  top: var(--topo-altura);
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  width: var(--lateral-recolhida);
+  padding: var(--esp-3) var(--esp-2);
+  background: var(--cor-superficie);
+  border-right: 1px solid var(--cor-borda);
+  list-style: none;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+  overflow: hidden;
+  transition: width 160ms ease, box-shadow 160ms ease;
+}
+
+/* Só onde existe ponteiro de verdade: no toque, `:hover` fica preso depois do toque. */
+@media (hover: hover) and (pointer: fine) {
+  .app-lateral:hover .nav-lista,
+  .app-lateral:focus-within .nav-lista {
+    width: var(--lateral-largura);
+    box-shadow: var(--sombra-2);
+  }
+}
+
+/* O foco do teclado abre a lateral em qualquer dispositivo: sem isso, quem navega por
+   Tab veria o realce de foco correr por trás de uma faixa de ícones. */
+.app-lateral:focus-within .nav-lista {
+  width: var(--lateral-largura);
+  box-shadow: var(--sombra-2);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  /* O recuo esquerdo centra o ícone na faixa estreita — e, como não muda quando a
+     lateral abre, o ícone fica parado e só o nome aparece ao lado. */
+  padding: var(--esp-2) 1rem;
+  min-height: 2.75rem;
+  color: var(--cor-texto-suave);
+  text-decoration: none;
+  font-weight: var(--peso-medio);
+  border-radius: var(--raio-completo);
+  white-space: nowrap;
+}
+
+/* O nome continua no DOM quando a lateral está fechada — leitores de tela leem, o
+   ponteiro não vê. */
+.nav-item span {
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.app-lateral:hover .nav-item span,
+.app-lateral:focus-within .nav-item span {
+  opacity: 1;
+}
+
+.nav-item:hover {
+  color: var(--cor-texto);
+  background: var(--cor-superficie-alt);
+}
+
+/* O item ativo não se distingue só pela cor: ganha fundo próprio e peso maior. */
+.nav-item-ativo,
+.nav-item-ativo:hover {
+  color: var(--cor-primaria);
+  background: var(--cor-primaria-suave);
+  font-weight: var(--peso-forte);
+}
+
+.app-veu {
+  display: none;
+}
+
+.app-conteudo {
+  flex: 1;
+  min-width: 0;
+  padding: var(--esp-4) var(--esp-3) var(--esp-6);
+}
+
+.conteudo-central {
+  max-width: var(--largura-larga);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-4);
+}
+
+.apenas-telefone {
+  display: none;
+}
+
+/* ---------------------------------------------------------------- cartão */
+.cartao {
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-m);
+  padding: var(--esp-4);
+}
+
+.cartao-limpo {
+  padding: 0;
+  overflow: hidden;
+}
+
+/* --------------------------------------------------------------- seções */
+.secao-topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--esp-3);
+  margin-bottom: var(--esp-3);
+}
+
+.secao-topo h2 {
+  margin: 0;
+  font-size: var(--texto-gg);
+  font-weight: var(--peso-forte);
+}
+
+.secao-topo p {
+  margin: var(--esp-1) 0 0;
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-p);
+}
+
+.link-acao {
+  color: var(--cor-primaria);
+  font-weight: var(--peso-medio);
+  font-size: var(--texto-p);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.link-acao:hover {
+  text-decoration: underline;
+}
+
+/* ------------------------------------------------------ grade de cartões */
+.grade-cartoes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: var(--esp-3);
+}
+
+/* Cada item ocupa a altura da linha: cartões vizinhos terminam juntos. */
+.grade-cartoes > li {
+  display: flex;
+}
+
+.grade-cartoes > li > * {
+  flex: 1;
+}
+
+/* ---------------------------------------------------------- estado vazio */
+.estado-vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--esp-2);
+  padding: var(--esp-5) var(--esp-3);
+  text-align: center;
+  color: var(--cor-texto-suave);
+}
+
+.estado-vazio-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  color: var(--cor-primaria);
+  background: var(--cor-primaria-suave);
+  border-radius: var(--raio-completo);
+}
+
+.estado-vazio-icone svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.estado-vazio h3 {
+  margin: 0;
+  font-size: var(--texto-g);
+  color: var(--cor-texto);
+}
+
+.estado-vazio p {
+  margin: 0;
+  max-width: 28rem;
+}
+
+/* ------------------------------------------------------- cartão de turma */
+/* Sem `overflow: hidden` aqui, de propósito.
+   Ele existia para a capa colorida respeitar o canto arredondado do cartão — e, de
+   quebra, recortava o menu de ações do rodapé: o menu abria (ficava no DOM, com
+   `aria-expanded`), mas nenhum pixel dele chegava à tela, e o clique nos três pontos
+   parecia não fazer nada. O arredondamento passou para a própria capa, que é quem
+   precisava dele. */
+.cartao-turma {
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
+  height: 100%;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-m);
+  transition: box-shadow 140ms ease, border-color 140ms ease;
+}
+
+.cartao-turma:hover {
+  border-color: var(--cor-borda-forte);
+  box-shadow: var(--sombra-2);
+}
+
+/* Capa sempre na cor da marca: o cartão identifica a turma pelo nome, não pela cor. */
+.cartao-turma-capa {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--esp-1);
+  min-height: 6.5rem;
+  padding: var(--esp-3);
+  color: var(--cor-sobre-capa);
+  background: var(--cor-capa);
+  /* Um pixel a menos que o raio do cartão: a capa fica por dentro da borda, e não
+     aparece a meia-lua clara que sobra quando os dois raios são iguais. */
+  border-radius: calc(var(--raio-m) - 1px) calc(var(--raio-m) - 1px) 0 0;
+}
+
+.cartao-turma-nome {
+  font-size: var(--texto-g);
+  font-weight: var(--peso-forte);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.cartao-turma-professor {
+  font-size: var(--texto-p);
+  opacity: 0.92;
+}
+
+/* Rodapé do cartão: separado do link, é onde ficam as ações sobre a turma. Sem ele, o
+   botão de três pontos estaria dentro do link do cartão — HTML inválido, e o clique
+   disputado entre abrir a turma e abrir o menu. */
+.cartao-turma-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--esp-1);
+  padding: var(--esp-1) var(--esp-2);
+  border-top: 1px solid var(--cor-borda);
+  border-radius: 0 0 calc(var(--raio-m) - 1px) calc(var(--raio-m) - 1px);
+}
+
+/* A parte clicável do cartão cresce; o rodapé fica sempre embaixo. */
+.cartao-turma-alvo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
+}
+
+.cartao-turma-dados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-1) var(--esp-3);
+  font-size: var(--texto-p);
+  color: var(--cor-texto-suave);
+}
+
+.cartao-turma-corpo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--esp-2);
+  padding: var(--esp-3);
+  font-size: var(--texto-p);
+  color: var(--cor-texto-suave);
+}
+
+/* ----------------------------------------------------------------- capa
+   Faixa de identificação no topo de uma tela de contexto (turma, por exemplo).
+   Mesma cor da capa do cartão, para a turma ser reconhecida ao entrar nela. */
+.capa {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--esp-1);
+  min-height: 8.5rem;
+  padding: var(--esp-4);
+  color: var(--cor-sobre-capa);
+  background: var(--cor-capa);
+  border-radius: var(--raio-m);
+}
+
+.capa h1 {
+  margin: 0;
+  font-size: var(--texto-ggg);
+  color: var(--cor-sobre-capa);
+  overflow-wrap: anywhere;
+}
+
+.capa-apoio {
+  font-size: var(--texto-p);
+  opacity: 0.92;
+}
+
+/* -------------------------------------------------------------- filtros em chip */
+.filtros-chip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+  margin-bottom: var(--esp-3);
+}
+
+.chip {
+  font: inherit;
+  font-weight: var(--peso-medio);
+  color: var(--cor-texto-suave);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-completo);
+  padding: var(--esp-1) var(--esp-3);
+  min-height: 2.25rem;
+  cursor: pointer;
+}
+
+.chip:hover {
+  color: var(--cor-texto);
+  background: var(--cor-superficie-alt);
+}
+
+/* Selecionado: cor, fundo, borda e peso — nunca só a cor. */
+.chip-ativo,
+.chip-ativo:hover {
+  color: var(--cor-primaria);
+  background: var(--cor-primaria-suave);
+  border-color: var(--cor-primaria-contorno);
+  font-weight: var(--peso-forte);
+}
+
+/* -------------------------------------------------------- etiquetas de estado */
+.etiqueta-sucesso {
+  color: var(--cor-sucesso);
+  background: var(--cor-sucesso-fundo);
+}
+
+.etiqueta-alerta {
+  color: var(--cor-alerta);
+  background: var(--cor-alerta-fundo);
+}
+
+.etiqueta-neutra {
+  color: var(--cor-texto-suave);
+  background: var(--cor-superficie-alt);
+}
+
+/* ------------------------------------------------- duas colunas com resumo à esquerda */
+/* As duas colunas terminam na mesma linha.
+   Era `align-items: start`, e aí o cartão da esquerda parava na altura do próprio
+   conteúdo enquanto o painel da direita seguia descendo — duas bordas inferiores
+   desencontradas, que é o que mais chama atenção num layout de duas colunas.
+   O conteúdo do cartão continua no topo; o que cresce é a moldura. */
+.colunas-resumo {
+  display: grid;
+  grid-template-columns: 17rem minmax(0, 1fr);
+  gap: var(--esp-3);
+  align-items: stretch;
+}
+
+/* No telefone as colunas viram uma só, e aí esticar não faz sentido: cada cartão volta
+   a ter a altura do que tem dentro. (A regra de uma coluna está na consulta de mídia.) */
+
+/* -------------------------------------------------------- voltar para a lista */
+.link-voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-1);
+  color: var(--cor-texto-suave);
+  text-decoration: none;
+  font-size: var(--texto-p);
+  font-weight: var(--peso-medio);
+}
+
+.link-voltar:hover {
+  color: var(--cor-primaria);
+}
+
+.link-voltar svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform: rotate(180deg);
+}
+
+/* ------------------------------------------------------- cartão de adicionar
+   Convite para criar algo, no meio da grade. Tracejado e sem preenchimento, para
+   não competir com os cartões que carregam dado de verdade. */
+.cartao-adicionar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--esp-2);
+  min-height: 100%;
+  padding: var(--esp-5) var(--esp-3);
+  color: var(--cor-texto-suave);
+  text-decoration: none;
+  font-weight: var(--peso-medio);
+  background: transparent;
+  border: 1px dashed var(--cor-borda-forte);
+  border-radius: var(--raio-m);
+  transition: color 140ms ease, border-color 140ms ease, background-color 140ms ease;
+}
+
+.cartao-adicionar:hover {
+  color: var(--cor-primaria);
+  background: var(--cor-primaria-suave);
+  border-color: var(--cor-primaria);
+}
+
+.cartao-adicionar svg {
+  width: 1.75rem;
+  height: 1.75rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ------------------------------------------------- editor em forma de formulário
+   Inspirado no Google Forms: um cartão por bloco, faixa colorida no cabeçalho e a
+   questão em foco destacada por uma barra lateral. */
+.cartao-formulario {
+  position: relative;
+  overflow: hidden;
+  border-top: 6px solid var(--cor-primaria);
+}
+
+/* Título e instruções da prova: campos sem moldura, que viram linha ao receber foco —
+   a tela parece o documento, não um formulário de cadastro. */
+.campo-livre {
+  display: block;
+  width: 100%;
+  font: inherit;
+  color: var(--cor-texto);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  padding: var(--esp-1) 0;
+  resize: vertical;
+}
+
+.campo-livre:hover:not(:disabled) {
+  border-bottom-color: var(--cor-borda);
+}
+
+.campo-livre:focus {
+  outline: none;
+  border-bottom: 2px solid var(--cor-primaria);
+}
+
+.campo-livre:disabled {
+  color: var(--cor-texto-suave);
+}
+
+.campo-livre-titulo {
+  font-size: var(--texto-ggg);
+  font-weight: var(--peso-forte);
+  color: var(--cor-titulo);
+  line-height: 1.25;
+}
+
+.campo-livre-apoio {
+  font-size: var(--texto-p);
+  color: var(--cor-texto-suave);
+}
+
+/* Rodapé do cabeçalho do formulário: resumo à esquerda, ação à direita. */
+.cartao-formulario-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--esp-2) var(--esp-3);
+  margin-top: var(--esp-3);
+}
+
+/* ---------------------------------------------------------- cartão de questão */
+.questao-cartao {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  padding: var(--esp-4);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-m);
+}
+
+/* A barra à esquerda marca a questão sob o ponteiro, como no Forms. */
+.questao-cartao::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  border-radius: var(--raio-m) 0 0 var(--raio-m);
+  background: transparent;
+}
+
+.questao-cartao:hover::before,
+.questao-cartao:focus-within::before {
+  background: var(--cor-primaria);
+}
+
+.questao-cartao-topo {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+}
+
+.questao-cartao-numero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  padding: 0 var(--esp-1);
+  font-size: var(--texto-p);
+  font-weight: var(--peso-forte);
+  color: var(--cor-primaria);
+  background: var(--cor-primaria-suave);
+  border-radius: var(--raio-completo);
+}
+
+.questao-cartao-enunciado {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.questao-cartao-rodape {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--esp-2) var(--esp-3);
+  padding-top: var(--esp-2);
+  border-top: 1px solid var(--cor-borda);
+}
+
+.questao-cartao-rodape .acoes {
+  display: flex;
+  gap: var(--esp-2);
+  margin-left: auto;
+}
+
+/* Pontuação da questão nesta prova. */
+.campo-pontos {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  font-size: var(--texto-p);
+  color: var(--cor-texto-suave);
+}
+
+.campo-pontos input {
+  width: 4.5rem;
+  font: inherit;
+  color: var(--cor-texto);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-p);
+  padding: var(--esp-1) var(--esp-2);
+  text-align: right;
+}
+
+/* Alternativas mostradas ao professor, com o gabarito marcado. */
+.alternativas-editor {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+}
+
+.alternativas-editor li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--esp-2);
+  font-size: var(--texto-p);
+}
+
+.alternativa-letra {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+  font-size: var(--texto-pp);
+  font-weight: var(--peso-forte);
+  color: var(--cor-texto-suave);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-completo);
+}
+
+.alternativas-editor .correta .alternativa-letra {
+  color: var(--cor-sucesso);
+  border-color: var(--cor-sucesso);
+}
+
+/* ----------------------------------------------- sugestão da IA na correção
+   Visualmente distinta do que o professor escreve: é material de apoio, de outra
+   origem, e não pode se confundir com a nota que ele já deu. */
+.bloco-ia {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+}
+
+.bloco-ia-topo {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--esp-2) var(--esp-3);
+}
+
+.cartao-sugestao {
+  padding: var(--esp-3);
+  background: var(--cor-primaria-suave);
+  border: 1px solid var(--cor-primaria-contorno);
+  border-radius: var(--raio-m);
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+}
+
+.cartao-sugestao p {
+  margin: 0;
+}
+
+/* Aprovada: muda para o tom de confirmação, para o professor distinguir de relance o que
+   já decidiu do que ainda aguarda. */
+.cartao-sugestao-aprovada {
+  background: var(--cor-sucesso-fundo);
+  border-color: var(--cor-sucesso-borda);
+}
+
+/* Contagem de ocorrências durante a prova: informação, não ameaça — por isso usa o tom
+   de alerta suave, e não o de erro. */
+.estado-monitoramento {
+  margin: 0 0 var(--esp-2);
+  padding: var(--esp-2) var(--esp-3);
+  font-size: var(--texto-p);
+  color: var(--cor-alerta);
+  background: var(--cor-alerta-fundo);
+  border: 1px solid var(--cor-alerta-borda);
+  border-radius: var(--raio-m);
+}
+
+/* -------------------------------------------- gabarito na tela do estudante
+   Reaproveita a lista de alternativas do editor, mas aqui cada linha é uma caixa:
+   a correta e a marcada precisam se distinguir de relance. A cor nunca responde
+   sozinha — ao lado de cada uma há o texto dizendo qual é qual (DS-06). */
+.alternativas-gabarito li {
+  padding: var(--esp-2) var(--esp-3);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-m);
+  background: var(--cor-superficie);
+}
+
+.alternativas-gabarito li.correta {
+  border-color: var(--cor-sucesso-borda);
+  background: var(--cor-sucesso-fundo);
+}
+
+/* A alternativa que o estudante marcou ganha uma faixa lateral: assim ele encontra a
+   própria resposta mesmo quando ela não é a correta. */
+.alternativas-gabarito li.marcada {
+  box-shadow: inset 3px 0 0 var(--cor-primaria);
+}
+
+.alternativas-gabarito li.marcada:not(.correta) {
+  border-color: var(--cor-erro-borda);
+  background: var(--cor-erro-fundo);
+}
+
+.alternativas-gabarito em {
+  color: var(--cor-texto-suave);
+  font-style: normal;
+}
+
+/* Discursiva: a resposta do estudante ao lado do que era esperado. */
+.comparacao-discursiva h3,
+.resultado-nota-rotulo {
+  font-size: var(--texto-pp);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cor-texto-suave);
+  margin: 0 0 var(--esp-1);
+}
+
+/* -------------------------------------------------------------- trilho de ações
+   Coluna de ações que acompanha a lista (adicionar questão, etc.). Vira uma linha
+   acima da lista no telefone. */
+.trilho-acoes {
+  position: sticky;
+  top: calc(var(--topo-altura) + var(--esp-3));
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  padding: var(--esp-2);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  /* Deixou de ser pílula: com texto ao lado do ícone, o raio completo arredondaria
+     demais e as bordas comeriam o rótulo. */
+  border-radius: var(--raio-2);
+}
+
+/* Botão do trilho: ícone + rótulo escrito, alinhados à esquerda para que os dois rótulos
+   comecem na mesma coluna e o olho compare um com o outro sem esforço. */
+.botao-trilho {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  width: 100%;
+  padding: var(--esp-2) var(--esp-3);
+  font: inherit;
+  font-size: 0.875rem;
+  color: var(--cor-texto-suave);
+  text-align: left;
+  white-space: nowrap;
+  background: transparent;
+  border: none;
+  border-radius: var(--raio-1);
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.botao-trilho:hover {
+  color: var(--cor-texto);
+  background: var(--cor-superficie-alt);
+}
+
+/* Estes SVGs não têm tamanho nem traço próprios — quem os dá é o CSS de quem os usa.
+   Sem isto, o ícone nasce preenchido de preto e se estica para o espaço disponível. */
+.botao-trilho svg {
+  flex-shrink: 0;
+  width: 1.375rem;
+  height: 1.375rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.com-trilho {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--esp-3);
+  align-items: start;
+}
+
+.lista-questoes-editor {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+}
+
+/* ------------------------------------------------------------- barra fixa
+   Avisa que há alteração pendente e oferece salvar sem rolar a página inteira. */
+.barra-fixa {
+  position: sticky;
+  /* Gruda no TOPO, logo abaixo da barra superior da aplicação: a barra acompanha a
+     rolagem e continua à vista em qualquer ponto de uma prova longa. */
+  top: calc(var(--topo-altura) + var(--esp-2));
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--esp-3);
+  margin-bottom: var(--esp-3);
+  padding: var(--esp-3);
+  background: var(--cor-superficie-elevada);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-m);
+  box-shadow: var(--sombra-2);
+}
+
+.barra-fixa .barra-acoes {
+  margin-left: auto;
+}
+
+/* ---------------------------------------------------------- item de lista */
+.item-lista {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  padding: var(--esp-3) 0;
+  border-top: 1px solid var(--cor-borda);
+}
+
+.item-lista:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+
+.item-lista:last-child {
+  padding-bottom: 0;
+}
+
+.item-lista-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: none;
+  color: var(--cor-primaria);
+  background: var(--cor-primaria-suave);
+  border-radius: var(--raio-completo);
+}
+
+.item-lista-icone svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.item-lista-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-lista-titulo {
+  margin: 0;
+  font-weight: var(--peso-forte);
+  color: var(--cor-texto);
+  overflow-wrap: anywhere;
+}
+
+.item-lista-apoio {
+  margin: var(--esp-1) 0 0;
+  font-size: var(--texto-p);
+  color: var(--cor-texto-suave);
+}
+
+/* ------------------------------------------------------------- saudação */
+.saudacao h1 {
+  margin: 0;
+  font-size: var(--texto-ggg);
+}
+
+.saudacao p {
+  margin: var(--esp-1) 0 0;
+  color: var(--cor-texto-suave);
+}
+
+/* ------------------------------------------------------ telefone e tablet */
+@media (max-width: 900px) {
+  .apenas-telefone {
+    display: inline-flex;
+  }
+
+  /* No telefone não há trilho: a lateral some e vira gaveta, aberta pelo botão de
+     menu. Abrir por aproximação não existe onde não há ponteiro. */
+  .app-lateral {
+    width: 0;
+  }
+
+  .app-lateral .nav-lista {
+    width: var(--lateral-largura);
+    z-index: 30;
+    transform: translateX(-100%);
+    transition: transform 160ms ease;
+    box-shadow: var(--sombra-3);
+  }
+
+  .app-lateral-aberta .nav-lista {
+    transform: translateX(0);
+  }
+
+  /* Na gaveta o nome é o conteúdo principal do item: nada de esconder. */
+  .app-lateral .nav-item span {
+    opacity: 1;
+  }
+
+  .app-veu {
+    display: block;
+    position: fixed;
+    inset: var(--topo-altura) 0 0 0;
+    z-index: 25;
+    padding: 0;
+    border: none;
+    background: rgb(0 0 0 / 40%);
+  }
+
+  .app-conteudo {
+    padding: var(--esp-3) var(--esp-3) var(--esp-5);
+  }
+
+  .item-lista {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .saudacao h1 {
+    font-size: var(--texto-gg);
+  }
+
+  /* O resumo passa a ficar acima da lista, em uma coluna só. */
+  .colunas-resumo {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .com-trilho {
+    grid-template-columns: 1fr;
+  }
+
+  .trilho-acoes {
+    position: static;
+    flex-direction: row;
+    justify-content: center;
+    order: -1;
+    border-radius: var(--raio-completo);
+  }
+
+  .capa {
+    min-height: 6.5rem;
+    padding: var(--esp-3);
+  }
+
+  .capa h1 {
+    font-size: var(--texto-gg);
+  }
+}
+
+@media (max-width: 480px) {
+  /* No telefone entra só o símbolo. A barra tem o botão de menu à esquerda e 5 rem de
+     ações à direita; o nome por extenso caberia, mas espremido — e um símbolo pequeno
+     é mais legível que um nome pequeno. Proporção do símbolo: 1,4:1. */
+  .marca-logo {
+    width: 2.45rem;
+    height: 1.75rem;
+    mask-image: url('/logo-simbolo.png');
+    -webkit-mask-image: url('/logo-simbolo.png');
+  }
+
+  .grade-cartoes {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Ficha de fatos: rótulo à esquerda, valor à direita, um par por linha. Nasceu na tela de
+   instruções da prova, onde período, tempo, tentativa e salvamento estavam num parágrafo
+   corrido — quatro informações independentes que ninguém lê como prosa antes de começar
+   uma avaliação. */
+.ficha {
+  margin: 0 0 var(--esp-3);
+  display: grid;
+  gap: var(--esp-2);
+}
+
+.ficha > div {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: var(--esp-2);
+  align-items: baseline;
+}
+
+.ficha dt {
+  color: var(--cor-texto-suave);
+  font-size: var(--texto-p);
+}
+
+.ficha dd {
+  margin: 0;
+}
+
+/* No telefone não há largura para duas colunas: o rótulo fica sobre o valor. */
+@media (max-width: 40rem) {
+  .ficha > div {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+/* O aviso de monitoramento (RF10). Caixa neutra, e não laranja de alerta: o sistema
+   registra eventos, não acusa ninguém (P-06), e a cor precisa dizer a mesma coisa que o
+   texto. Ela se destaca pelo fundo e pela borda, que bastam para ninguém passar batido. */
+.bloco-monitoramento {
+  margin-bottom: var(--esp-3);
+  padding: var(--esp-3);
+  background: var(--cor-superficie-alt);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+}
+
+.bloco-monitoramento .cartao-titulo {
+  margin-top: 0;
+}
+
+/* Barra de filtros acima de uma lista: os chips de situação à esquerda e o seletor de
+   turma à direita. Nasceu na lista de avaliações do estudante, quando ela virou a tela
+   de pendências — dois controles que filtram a MESMA lista pertencem à mesma linha.
+   `align-items: end` alinha o seletor pela base, e não pelo meio, porque o rótulo dele é
+   invisível (o texto "Todas as turmas" já diz o que ele faz). */
+.barra-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--esp-3);
+}
+
+/* Dentro da barra os chips já têm o espaçamento dela; a margem própria sobraria. */
+.barra-filtros .filtros-chip {
+  margin-bottom: 0;
+}
+
+.barra-filtros select {
+  min-width: 14rem;
+}
+
+/* No telefone os dois controles ocupam a largura toda, um sobre o outro. */
+@media (max-width: 40rem) {
+  .barra-filtros > * {
+    width: 100%;
+  }
+}
+
+/* O menu de três pontos vai para a ponta direita da linha de ações do cartão. Ao lado do
+   botão "Abrir" ele parecia mais uma ação da mesma família; na ponta, fica claro que é o
+   "resto" — e é onde a mão procura o menu de um cartão. `margin-left: auto` em vez de
+   `justify-content: space-between` na linha inteira: assim os botões à esquerda
+   continuam agrupados entre si quando houver mais de um. */
+.cartao-questao .acoes > .menu-acoes {
+  margin-left: auto;
+}
+
+/* ------------------------------------------------------------------- sino de avisos */
+
+/* O contador fica sobre o canto do sino, como num aplicativo de telefone — é onde a
+   pessoa já procura. `position: relative` no botão para o número se prender a ele. */
+.sino {
+  position: relative;
+}
+
+.sino-contador {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 1.05rem;
+  padding: 0 0.25rem;
+  font-size: 0.7rem;
+  font-weight: var(--peso-medio);
+  line-height: 1.05rem;
+  text-align: center;
+  color: var(--cor-sobre-capa);
+  background: var(--cor-erro);
+  border-radius: var(--raio-completo);
+  /* Um anel da cor da barra separa o número do desenho do sino embaixo dele. */
+  box-shadow: 0 0 0 2px var(--cor-superficie);
+}
+
+/* O painel de avisos é mais largo que um menu de ações: cada linha tem título da prova,
+   turma e prazo, e com a largura de menu tudo quebraria em três linhas. */
+.menu-flutuante-largo {
+  min-width: 22rem;
+  max-width: min(26rem, calc(100vw - var(--esp-4)));
+}
+
+/* Aviso é um bloco de duas linhas, não um item de menu de uma linha só: o selo fica no
+   topo, ao lado do texto, e não centralizado na altura do conjunto. */
+.menu-item-aviso {
+  align-items: flex-start;
+}
+
+.menu-item-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.menu-item-texto .texto-suave {
+  font-size: var(--texto-p);
+}
+
+.aviso-vazio {
+  margin: 0;
+  padding: var(--esp-2);
+  font-size: var(--texto-p);
+}
+
+/* ------------------------------------------------- grupos dobráveis por prazo */
+
+/* O cabeçalho do grupo é a área clicável inteira, e não só o texto: um alvo da largura
+   do cartão é o que faz o gesto funcionar no telefone. */
+.grupo-prazo-topo {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  cursor: pointer;
+  /* Tira o triângulo que o navegador desenha sozinho: a seta à direita é a nossa. */
+  list-style: none;
+}
+
+.grupo-prazo-topo::-webkit-details-marker {
+  display: none;
+}
+
+.grupo-prazo-topo h2 {
+  flex: 1;
+  min-width: 0;
+  /* O título herda o cinza de `details summary`; aqui ele é o título do bloco. */
+  color: var(--cor-texto);
+  font-size: var(--texto-m);
+}
+
+/* A seta aponta para baixo quando o grupo está fechado e gira ao abrir — o movimento é o
+   que diz qual dos dois estados é o atual, sem precisar de dois ícones. */
+.grupo-prazo-seta {
+  flex-shrink: 0;
+  color: var(--cor-texto-suave);
+  transform: rotate(90deg);
+  transition: transform 150ms ease;
+}
+
+.grupo-prazo[open] > .grupo-prazo-topo .grupo-prazo-seta {
+  transform: rotate(-90deg);
+}
+
+/* Quem prefere menos movimento não vê a seta girar. */
+@media (prefers-reduced-motion: reduce) {
+  .grupo-prazo-seta {
+    transition: none;
+  }
+}
+
+/* ----------------------------------------------------------- urgência do prazo */
+
+/* A cor é a SEGUNDA camada: quem não distingue vermelho de laranja — e quem imprime —
+   lê a mesma informação no texto ("Vence em 2 horas"). Por isso aqui não há ícone nem
+   fundo: o texto já carrega o sentido, e a cor só o acelera. */
+.prazo {
+  font-weight: var(--peso-medio);
+}
+
+.prazo-critico {
+  color: var(--cor-erro);
+}
+
+.prazo-atencao {
+  color: var(--cor-alerta);
+}
+
+/* Prazo folgado não ganha destaque nenhum: destacar tudo é não destacar nada. */
+.prazo-normal {
+  color: inherit;
+  font-weight: inherit;
+}
+
+/* ------------------------------------------------------------------ diálogo */
+
+/* O `<dialog>` nativo vem sem estilo nenhum e centralizado por margem automática. Daqui
+   para baixo ele veste o Design System: a mesma superfície, borda e sombra dos cartões. */
+.dialogo {
+  width: min(32rem, calc(100vw - var(--esp-4)));
+  padding: 0;
+  color: var(--cor-texto);
+  background: var(--cor-superficie-elevada);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-g);
+  box-shadow: var(--sombra-2);
+}
+
+/* O fundo escurece o resto da página — é o que diz que nada mais responde enquanto a
+   caixa estiver aberta. */
+.dialogo::backdrop {
+  background: rgb(0 0 0 / 0.55);
+}
+
+.dialogo-corpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+  padding: var(--esp-4);
+}
+
+.dialogo-corpo h2 {
+  margin: 0;
+  font-size: var(--texto-g);
+}
+
+/* A última margem de dentro do conteúdo sobra: o `gap` do corpo já separa dos botões. */
+.dialogo-conteudo > :last-child {
+  margin-bottom: 0;
+}
+
+.dialogo-conteudo .ficha {
+  margin-bottom: 0;
+}
+
+.dialogo-conteudo .bloco-monitoramento {
+  margin-top: var(--esp-3);
+  margin-bottom: 0;
+}
+
+/* Os botões à direita, confirmar por último: é a ordem em que se lê uma decisão. */
+.dialogo-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--esp-2);
+}
+
+/* No telefone, cada botão ocupa a largura toda — alvo grande para o polegar. */
+@media (max-width: 30rem) {
+  .dialogo-acoes {
+    flex-direction: column-reverse;
+  }
+
+  .dialogo-acoes .botao {
+    width: 100%;
+  }
+}
+
+/* Os botões da coluna de ações não devem quebrar no meio de uma palavra nem empilhar
+   com sobra: cada um é curto, e numa linha estreita é melhor que a coluna role do que
+   um botão rachar ao meio. */
+.tabela .barra-acoes {
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.tabela .barra-acoes .botao {
+  white-space: nowrap;
+}
+
+/* Aviso da questão fechada pela devolução: fica abaixo do enunciado, antes das
+   alternativas, para ser lido antes da tentativa de clicar — e não depois. */
+.questao-prova-travada {
+  margin: 0 0 var(--esp-2);
+  font-size: var(--texto-p);
+}

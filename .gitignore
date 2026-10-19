@@ -1,0 +1,20 @@
+# Dependências e builds
+node_modules/
+dist/
+coverage/
+
+# Segredos — NUNCA versionar
+.env
+.env.*
+!.env.example
+
+# Sistema/editor
+.DS_Store
+Thumbs.db
+.vscode/
+*.log
+
+# Documentação de trabalho — contexto do desenvolvimento, não faz parte do produto.
+# Fica apenas na máquina do autor. O README é a exceção: é a apresentação do repositório.
+*.md
+!README.md

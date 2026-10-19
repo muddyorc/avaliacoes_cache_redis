@@ -1,0 +1,583 @@
+SUITE COMPLETA DO BACKEND - npm test
+Data: 2026-10-05
+Node v24.21.0
+1930470 Interface do Design System, congelamento das questoes (P-22), divulgacao dos resultados (P-23) e saida da turma (P-24)
+
+
+> avaliacoes-backend@0.1.0 test
+> node scripts/testar.js
+
+[testar] usando o banco de teste "avaliacoes_teste" (o banco de desenvolvimento não é tocado).
+✔ login válido cria a sessão e devolve o usuário sem qualquer dado de senha (1691.9097ms)
+✔ login aceita o e-mail com maiúsculas e espaços (o cadastro é case-insensitive) (760.4524ms)
+✔ senha incorreta é recusada com mensagem genérica (726.987ms)
+✔ usuário inexistente recebe exatamente a mesma mensagem da senha incorreta (893.518ms)
+✔ usuário inativo não entra, mesmo com a senha correta (738.9438ms)
+✔ login com corpo inválido devolve erro por campo, sem tocar no banco (675.0947ms)
+✔ o cookie de sessão é httpOnly e SameSite=Strict, e o JWT não é exposto ao JavaScript (800.2626ms)
+✔ um cookie de sessão adulterado é recusado (627.3112ms)
+✔ rota protegida sem autenticação devolve 401 (666.4694ms)
+✔ rota protegida com sessão válida devolve os dados do próprio usuário (782.1137ms)
+✔ a autorização por perfil é aplicada no backend, não apenas na interface (933.2511ms)
+✔ o perfil vem do banco: enviá-lo no corpo ou no cabeçalho não muda nada (750.4678ms)
+✔ inativar o usuário derruba a sessão em aberto na requisição seguinte (725.0011ms)
+✔ logout encerra a sessão e a rota protegida volta a exigir autenticação (730.1874ms)
+✔ logout sem sessão não quebra (idempotente) (630.1409ms)
+✔ login bem-sucedido é registrado com IP e marcado como sucesso (759.8596ms)
+✔ tentativas que falham também ficam registradas, com o motivo (1091.7753ms)
+✔ o registro de acesso nunca guarda a senha digitada (800.3667ms)
+
+[email] SMTP não configurado — mensagem registrada no log (somente desenvolvimento)
+        Para: prof@exemplo.com
+        Assunto: Redefinição de senha — Sistema de Avaliações
+Olá, Prof. Teste.
+
+Recebemos um pedido para redefinir a senha da sua conta.
+Acesse o link abaixo para cadastrar uma nova senha:
+
+http://localhost:5173/redefinir-senha?token=U-PGsOwOnHAXAjdu0FREHCy7ofRw88dr-SM9VOHSmcI
+
+O link vale por 60 minutos e pode ser usado uma única vez.
+Se você não solicitou a redefinição, ignore esta mensagem: sua senha atual continua valendo.
+
+
+[auth] pedido de redefinição para e-mail sem conta ativa (ninguem@exemplo.com) — nada enviado. IP: ::ffff:127.0.0.1
+✔ pedido de recuperação responde igual para e-mail existente e inexistente (687.5831ms)
+
+[email] SMTP não configurado — mensagem registrada no log (somente desenvolvimento)
+        Para: prof@exemplo.com
+        Assunto: Redefinição de senha — Sistema de Avaliações
+Olá, Prof. Teste.
+
+Recebemos um pedido para redefinir a senha da sua conta.
+Acesse o link abaixo para cadastrar uma nova senha:
+
+http://localhost:5173/redefinir-senha?token=Id4YHlO-8C-tJrAYDRASulF1UkEyp95Ouf6Zp3eQ7kE
+
+O link vale por 60 minutos e pode ser usado uma única vez.
+Se você não solicitou a redefinição, ignore esta mensagem: sua senha atual continua valendo.
+
+
+✔ a resposta da recuperação nunca contém o token nem o link (707.939ms)
+
+[email] SMTP não configurado — mensagem registrada no log (somente desenvolvimento)
+        Para: prof@exemplo.com
+        Assunto: Redefinição de senha — Sistema de Avaliações
+Olá, Prof. Teste.
+
+Recebemos um pedido para redefinir a senha da sua conta.
+Acesse o link abaixo para cadastrar uma nova senha:
+
+http://localhost:5173/redefinir-senha?token=SIxZjS-q9qfjnlnhl-9aYV8KuWvXRN7G1lh2O_qkfJ4
+
+O link vale por 60 minutos e pode ser usado uma única vez.
+Se você não solicitou a redefinição, ignore esta mensagem: sua senha atual continua valendo.
+
+
+✔ o banco guarda apenas o hash do token, nunca o token em si (579.0191ms)
+
+[email] SMTP não configurado — mensagem registrada no log (somente desenvolvimento)
+        Para: prof@exemplo.com
+        Assunto: Redefinição de senha — Sistema de Avaliações
+Olá, Prof. Teste.
+
+Recebemos um pedido para redefinir a senha da sua conta.
+Acesse o link abaixo para cadastrar uma nova senha:
+
+http://localhost:5173/redefinir-senha?token=5k4c89JO0VfaqCLHGcrK5GmbDw9N1Uq1-pG8qpkRa2M
+
+O link vale por 60 minutos e pode ser usado uma única vez.
+Se você não solicitou a redefinição, ignore esta mensagem: sua senha atual continua valendo.
+
+
+✔ token de recuperação válido redefine a senha e permite entrar com a nova (1121.3457ms)
+
+[email] SMTP não configurado — mensagem registrada no log (somente desenvolvimento)
+        Para: prof@exemplo.com
+        Assunto: Redefinição de senha — Sistema de Avaliações
+Olá, Prof. Teste.
+
+Recebemos um pedido para redefinir a senha da sua conta.
+Acesse o link abaixo para cadastrar uma nova senha:
+
+http://localhost:5173/redefinir-senha?token=lQLIdU-Ue28VRpUGL7bZJ28X6Uy6c9dGlK6w-uAptkA
+
+O link vale por 60 minutos e pode ser usado uma única vez.
+Se você não solicitou a redefinição, ignore esta mensagem: sua senha atual continua valendo.
+
+
+✔ token já utilizado não funciona uma segunda vez (971.8218ms)
+
+[email] SMTP não configurado — mensagem registrada no log (somente desenvolvimento)
+        Para: prof@exemplo.com
+        Assunto: Redefinição de senha — Sistema de Avaliações
+Olá, Prof. Teste.
+
+Recebemos um pedido para redefinir a senha da sua conta.
+Acesse o link abaixo para cadastrar uma nova senha:
+
+http://localhost:5173/redefinir-senha?token=azu7qQijkjGMmOa1-CHabx0nHbNaCdXV7KbC7W0pfYc
+
+O link vale por 60 minutos e pode ser usado uma única vez.
+Se você não solicitou a redefinição, ignore esta mensagem: sua senha atual continua valendo.
+
+
+✔ token expirado é recusado (705.9501ms)
+
+[email] SMTP não configurado — mensagem registrada no log (somente desenvolvimento)
+        Para: prof@exemplo.com
+        Assunto: Redefinição de senha — Sistema de Avaliações
+Olá, Prof. Teste.
+
+Recebemos um pedido para redefinir a senha da sua conta.
+Acesse o link abaixo para cadastrar uma nova senha:
+
+http://localhost:5173/redefinir-senha?token=LshaO6681sPi5kkL4d6shrrXfOs2ZV9km74VggtJ5jk
+
+O link vale por 60 minutos e pode ser usado uma única vez.
+Se você não solicitou a redefinição, ignore esta mensagem: sua senha atual continua valendo.
+
+
+
+[email] SMTP não configurado — mensagem registrada no log (somente desenvolvimento)
+        Para: prof@exemplo.com
+        Assunto: Redefinição de senha — Sistema de Avaliações
+Olá, Prof. Teste.
+
+Recebemos um pedido para redefinir a senha da sua conta.
+Acesse o link abaixo para cadastrar uma nova senha:
+
+http://localhost:5173/redefinir-senha?token=rDIT9P-VaSqxPhoxvWN8_f4Omy2uJhzOdtXQNFrqywM
+
+O link vale por 60 minutos e pode ser usado uma única vez.
+Se você não solicitou a redefinição, ignore esta mensagem: sua senha atual continua valendo.
+
+
+✔ pedir um novo link invalida o anterior (811.1618ms)
+✔ token inexistente e token expirado devolvem a mesma mensagem (617.9373ms)
+[auth] pedido de redefinição para e-mail sem conta ativa (inativo@exemplo.com) — nada enviado. IP: -
+✔ usuário inativo não recebe link de redefinição (659.8601ms)
+
+[email] SMTP não configurado — mensagem registrada no log (somente desenvolvimento)
+        Para: prof@exemplo.com
+        Assunto: Redefinição de senha — Sistema de Avaliações
+Olá, Prof. Teste.
+
+Recebemos um pedido para redefinir a senha da sua conta.
+Acesse o link abaixo para cadastrar uma nova senha:
+
+http://localhost:5173/redefinir-senha?token=gTi546GbJfkkpBKeA5kd12A0TR5NzH3noYlQzFeEg38
+
+O link vale por 60 minutos e pode ser usado uma única vez.
+Se você não solicitou a redefinição, ignore esta mensagem: sua senha atual continua valendo.
+
+
+✔ a nova senha precisa ter pelo menos 8 caracteres (761.9657ms)
+✔ tentativas de login em excesso são bloqueadas com 429 (985.572ms)
+✔ logins bem-sucedidos não consomem o limite de tentativas (1209.9586ms)
+
+[email] SMTP não configurado — mensagem registrada no log (somente desenvolvimento)
+        Para: prof@exemplo.com
+        Assunto: Redefinição de senha — Sistema de Avaliações
+Olá, Prof. Teste.
+
+Recebemos um pedido para redefinir a senha da sua conta.
+Acesse o link abaixo para cadastrar uma nova senha:
+
+http://localhost:5173/redefinir-senha?token=IpHzkJ3i9NiLQhiNuB_Tl9TK7AkKtL1-Jj8__mGqUkQ
+
+O link vale por 60 minutos e pode ser usado uma única vez.
+Se você não solicitou a redefinição, ignore esta mensagem: sua senha atual continua valendo.
+
+
+
+[email] SMTP não configurado — mensagem registrada no log (somente desenvolvimento)
+        Para: prof@exemplo.com
+        Assunto: Redefinição de senha — Sistema de Avaliações
+Olá, Prof. Teste.
+
+Recebemos um pedido para redefinir a senha da sua conta.
+Acesse o link abaixo para cadastrar uma nova senha:
+
+http://localhost:5173/redefinir-senha?token=Y-7lqnFl7id33r8vN2P7dUDg551gZZPpm-dRH6Y-BTE
+
+O link vale por 60 minutos e pode ser usado uma única vez.
+Se você não solicitou a redefinição, ignore esta mensagem: sua senha atual continua valendo.
+
+
+✔ pedidos de recuperação de senha em excesso são bloqueados com 429 (633.9869ms)
+
+[email] SMTP não configurado — mensagem registrada no log (somente desenvolvimento)
+        Para: prof@exemplo.com
+        Assunto: Redefinição de senha — Sistema de Avaliações
+Olá, Prof. Teste.
+
+Recebemos um pedido para redefinir a senha da sua conta.
+Acesse o link abaixo para cadastrar uma nova senha:
+
+http://localhost:5173/redefinir-senha?token=y3M8ddZPp8t6AaOAUEdhfWBwUq_2FP7Z812NjP3EMoc
+
+O link vale por 60 minutos e pode ser usado uma única vez.
+Se você não solicitou a redefinição, ignore esta mensagem: sua senha atual continua valendo.
+
+
+
+[email] SMTP não configurado — mensagem registrada no log (somente desenvolvimento)
+        Para: prof@exemplo.com
+        Assunto: Redefinição de senha — Sistema de Avaliações
+Olá, Prof. Teste.
+
+Recebemos um pedido para redefinir a senha da sua conta.
+Acesse o link abaixo para cadastrar uma nova senha:
+
+http://localhost:5173/redefinir-senha?token=ILsdKHi8fjkBf8MQjYuHbr4TySU-hR3ubh_kK-Qas24
+
+O link vale por 60 minutos e pode ser usado uma única vez.
+Se você não solicitou a redefinição, ignore esta mensagem: sua senha atual continua valendo.
+
+
+✔ esgotar o limite de envio de e-mail não impede concluir uma redefinição em andamento (757.8575ms)
+✔ somente o professor gerencia avaliações (RN02) (1657.4446ms)
+✔ um professor não vê nem altera as avaliações de outro (1167.1138ms)
+✔ não é possível montar avaliação com questões de outro professor (1005.0358ms)
+✔ professor cria avaliação, que nasce em rascunho (UC03) (863.8091ms)
+✔ campos obrigatórios vazios voltam indicados um a um (UC03 A1) (878.4537ms)
+✔ regressão: duração vazia aponta o campo pendente, não "maior que zero" (UC03 A1) (898.2122ms)
+✔ regressão: os campos opcionais podem simplesmente não vir no corpo (943.0161ms)
+✔ nenhuma mensagem de validação sai em inglês (932.1681ms)
+✔ o período precisa terminar depois de começar (P-05) (869.7102ms)
+✔ a duração não pode exceder o período disponível (927.9341ms)
+✔ limite de ocorrências: vazio registra sem bloquear, número precisa ser positivo (P-06) (1000.5875ms)
+✔ sem monitoramento não há limite de ocorrências (P-06) (968.9429ms)
+✔ professor monta a avaliação com questões do banco, na ordem escolhida (1071.2067ms)
+✔ a avaliação ainda não aplicada não traz gabarito nem alternativas (DT64) (1073.1286ms)
+✔ depois de congelada, a avaliação traz a cópia das alternativas ao professor (P-22) (1061.7956ms)
+✔ reordenar, remover e ajustar pontuação em uma só operação (1118.8904ms)
+✔ a mesma questão não entra duas vezes (1024.4108ms)
+✔ a mesma questão pode ser reutilizada em várias avaliações (P-01) (1028.6056ms)
+✔ questão inativa não pode ser adicionada (967.471ms)
+✔ avaliação sem questões não pode ser publicada (RN01) (924.1188ms)
+✔ avaliação com questões é publicada (860.1231ms)
+✔ não publica com questão que foi inativada depois de adicionada (1171.5525ms)
+✔ não publica avaliação cujo período já terminou (997.1718ms)
+✔ publicar duas vezes é recusado (947.7167ms)
+✔ publicar ativa a proteção de UC05 A1 sobre as questões (965.3538ms)
+✔ rascunho e publicada sem tentativa podem ser editadas (P-15a) (970.5105ms)
+✔ avaliação publicada não pode perder todas as questões (RN01 continua valendo) (937.2024ms)
+✔ avaliação publicada não pode ter o término movido para o passado (1010.0361ms)
+✔ depois da primeira tentativa, nenhuma alteração estrutural é aceita (UC04 A1) (1010.3131ms)
+✔ avaliação iniciada continua podendo ser consultada, arquivada e duplicada (P-15a) (978.5028ms)
+✔ avaliação iniciada não pode ser excluída (1092.4803ms)
+✔ duplicar cria avaliação nova, independente e em rascunho (1138.2415ms)
+✔ arquivar tira a avaliação das ativas e congela a edição (1076.6995ms)
+✔ excluir é lógico: some das listas, mas a linha continua no banco (1009.2552ms)
+✔ excluir uma publicada sem tentativa libera as questões para inativação (1083.0173ms)
+✔ não existe exclusão física de avaliação (1043.9531ms)
+✔ a listagem separa ativas e arquivadas, busca por título e pagina (1110.6241ms)
+✔ id inexistente ou inválido não quebra a API (1033.2034ms)
+✔ a avaliação nasce privada, e pode ser criada pública (P-19) (975.4591ms)
+✔ a visibilidade pode ser trocada antes do início e é copiada na duplicação (933.8035ms)
+✔ a migração 003 deixa as avaliações antigas como privadas (893.3417ms)
+✔ o professor vincula a avaliação a uma ou mais turmas (UC07) (993.6729ms)
+✔ nenhuma turma selecionada é recusado (UC07 A1) (865.4577ms)
+✔ turma já vinculada é informada (UC07 A2) (972.3902ms)
+✔ só se vincula a turmas próprias e ativas (1025.5683ms)
+✔ avaliação arquivada não recebe novas turmas (944.3205ms)
+✔ retirar uma turma antes do início é permitido (893.1099ms)
+✔ depois do início, turmas podem ser acrescentadas mas não retiradas (DT41) (914.2098ms)
+✔ duplicar não copia as turmas: a cópia costuma ser para outro público (973.4488ms)
+✔ P-19: privada sem turma não publica; com turma publica (1030.7454ms)
+✔ P-19: pública publica sem turma, e pode ter turmas também (950.7741ms)
+✔ P-19: privada publicada não pode perder a última turma (1010.4237ms)
+✔ P-19: pública publicada sem turma não pode virar privada (1051.5037ms)
+✔ o professor abre a própria prova como o estudante a veria, sem gabarito (1001.6989ms)
+✔ o teste é corrigido no servidor: objetiva certa pontua, errada e em branco valem 0 (918.8739ms)
+✔ objetiva errada no teste mostra qual era a correta (1003.4031ms)
+✔ o teste do professor não grava nada e não trava a avaliação (962.5745ms)
+✔ o teste funciona em rascunho, em arquivada e em avaliação já iniciada (949.1497ms)
+✔ sem questões não há o que testar (928.8341ms)
+✔ respostas que não pertencem à prova são recusadas (913.3394ms)
+✔ só o dono faz o teste da avaliação (1276.4529ms)
+✔ a prova só congela quando o primeiro estudante a inicia (1527.3706ms)
+✔ o segundo estudante não congela de novo (1095.7852ms)
+✔ editar a questão no banco não altera a prova já aplicada (967.0462ms)
+✔ a correção usa o gabarito congelado, não o do banco (1010.3942ms)
+✔ inativar a questão no banco não afeta a prova já aplicada (1049.0615ms)
+✔ UC05 A1 continua: questão de prova publicada e ainda não aplicada não é inativada (827.7007ms)
+✔ o professor vê na prova o texto congelado, e no banco o texto novo (995.1864ms)
+✔ a tela de correção mostra a questão como o estudante a viu (1134.7784ms)
+✔ somente o professor dono acessa a correção (2389.0425ms)
+✔ ao entregar, a objetiva certa já vale a pontuação da avaliação (1235.1816ms)
+✔ avaliação só de objetivas já sai da entrega com a correção concluída (1310.3689ms)
+✔ objetiva errada vale 0 e o sistema registra que errou (1206.8313ms)
+✔ P-12: objetiva não respondida vale 0, sem criar resposta falsa (1328.0393ms)
+✔ a prova encerrada por tempo também é corrigida (1342.8555ms)
+✔ o painel mostra quem fez, o que falta corrigir e a nota das objetivas (1368.1566ms)
+✔ prova em andamento aparece no painel, mas não pode ser corrigida (1300.7329ms)
+✔ o professor vê a resposta do estudante, o gabarito e a referência da discursiva (1343.962ms)
+✔ o professor dá nota e feedback na discursiva, e a nota total é calculada (1277.8555ms)
+✔ corrigir de novo atualiza a nota, sem duplicar a resposta (1399.6818ms)
+✔ discursiva deixada em branco pode receber nota, e a linha é criada (1353.5024ms)
+✔ a nota não pode passar do valor da questão (1186.7365ms)
+✔ o professor não dá nota manual em questão objetiva (RF11) (1389.6666ms)
+✔ um professor não corrige a prova de avaliação alheia (1365.6854ms)
+✔ P-07: a nota só chega ao estudante depois da liberação (1271.6805ms)
+✔ P-07: não libera com prova sem correção concluída (1506.8476ms)
+✔ P-07: não libera com prova ainda em andamento (1363.5259ms)
+✔ não libera avaliação que ninguém fez, nem libera duas vezes (1469.2859ms)
+✔ depois de liberar, corrigir de novo atualiza a nota que o estudante vê (1348.0046ms)
+✔ o estudante nunca recebe gabarito nem resposta esperada, mesmo com resultados liberados (1318.0397ms)
+✔ nenhuma resposta é apagada em todo o fluxo de correção (1470.9301ms)
+✔ somente o professor vê o dashboard, e só dos próprios dados (2199.9788ms)
+✔ a lista de análise traz avaliações e turmas, marcando o que ainda não tem dados (1437.0886ms)
+✔ UC12 A2: avaliação sem prova corrigida devolve indicadores indisponíveis, com motivo (1484.8696ms)
+✔ UC12 A1: turma sem avaliação realizada informa que não há dados (1295.8057ms)
+✔ média, mediana, extremos e distribuição das notas (UC12, passos 6 e 7) (2041.0128ms)
+✔ estudantes abaixo da média aparecem do pior para o melhor (UC12, passo 8) (2191.6992ms)
+✔ P-14: objetiva usa % de acertos e discursiva usa nota obtida ÷ nota máxima (2096.5531ms)
+✔ questões com mais acertos e com mais erros são destacadas (UC12, passos 9 e 10) (1700.3804ms)
+✔ numa prova longa, os dois destaques trazem questões diferentes (DT60) (1754.9343ms)
+✔ objetiva não respondida conta como erro no índice (P-12) (1591.7319ms)
+✔ prova entregue antes da correção automática entra no dashboard mesmo assim (1569.96ms)
+✔ o filtro por turma considera só os estudantes daquela turma (1816.6061ms)
+✔ filtrar por turma que não fez a prova não diz que ninguém realizou (1450.2527ms)
+✔ turma de outro professor é recusada no filtro (1454.3206ms)
+✔ o painel da turma resume as avaliações e o desempenho de cada estudante (1783.2703ms)
+✔ estudante da turma que não fez a prova aparece sem média, e não conta como zero (1660.0789ms)
+✔ id inexistente ou inválido não quebra o dashboard (1293.9169ms)
+✔ todas as tabelas do modelo existem (112.9507ms)
+✔ administrador inicial existe com senha em hash bcrypt (nunca texto puro) (140.7629ms)
+▶ regras de integridade garantidas pelo banco
+  ✔ e-mail é único sem diferenciar maiúsculas (13.4633ms)
+  ✔ perfil fora dos três permitidos é recusado (P-17) (4.2225ms)
+  ✔ no máximo uma alternativa correta por questão (P-13) (2.0235ms)
+  ✔ período da avaliação exige fim depois do início (P-05) (2.4207ms)
+  ✔ mesma questão pode ser reutilizada em outra avaliação (P-01) (2.4517ms)
+  ✔ uma única tentativa por estudante por avaliação (P-04) (1.8449ms)
+  ✔ tentativa bloqueada exige motivo registrado (P-06) (2.3397ms)
+  ✔ uma resposta por questão por tentativa (base do autosave) (6.2713ms)
+  ✔ tipo de evento de monitoramento restrito à lista prevista (RF10) (2.5406ms)
+✔ regras de integridade garantidas pelo banco (74.9768ms)
+✔ os testes rodam com NODE_ENV=test (1.6115ms)
+✔ a conexão usa DATABASE_URL_TESTE, e não DATABASE_URL (0.4441ms)
+✔ o banco conectado tem nome diferente do banco de desenvolvimento (92.594ms)
+✔ a guarda aborta os testes se o isolamento for quebrado (1.1211ms)
+✔ somente o professor acessa o banco de questões (Quadro 31) (1530.6608ms)
+✔ estudante não consegue criar questão nem ler o gabarito (983.472ms)
+✔ professor cria questão objetiva com alternativas e gabarito (769.2344ms)
+✔ verdadeiro/falso é uma objetiva de duas alternativas (P-03) (966.7321ms)
+✔ professor cria questão discursiva com resposta esperada e critérios (979.3681ms)
+✔ critérios de correção são opcionais na discursiva (950.0173ms)
+✔ objetiva sem nenhuma alternativa correta é recusada (P-13) (907.3441ms)
+✔ objetiva com duas alternativas corretas é recusada (P-13) (821.6529ms)
+✔ objetiva precisa de pelo menos 2 e no máximo 10 alternativas (897.4842ms)
+✔ alternativas com o mesmo texto são recusadas (953.4676ms)
+✔ discursiva sem resposta esperada é recusada (836.2443ms)
+✔ discursiva com alternativas é recusada (943.3948ms)
+✔ enunciado vazio, pontuação inválida e tipo desconhecido são recusados (956.2057ms)
+✔ um professor não vê nem altera as questões de outro (1109.5296ms)
+✔ a listagem filtra por tipo, tema e texto do enunciado (870.6176ms)
+✔ a listagem mostra só as ativas por padrão e aceita ver as inativas (842.0384ms)
+✔ a lista de temas agrupa grafias iguais e é só do professor (1146.2943ms)
+✔ a listagem pagina e informa o total (1006.5094ms)
+✔ professor edita a questão, inclusive as alternativas (875.5182ms)
+✔ trocar objetiva por discursiva descarta as alternativas (999.4741ms)
+✔ edição inválida não altera nada (825.9462ms)
+✔ questão em avaliação ainda não iniciada pode ser editada (P-15a) (853.6514ms)
+✔ questão já respondida pode ser editada; a prova aplicada guarda a própria cópia (P-22) (966.1522ms)
+✔ questão já aplicada pode ser inativada quando nenhuma prova pendente depende dela (P-22) (907.191ms)
+✔ questão já respondida pode ser duplicada, e a cópia é independente (924.6565ms)
+✔ a duplicação também funciona para discursivas (888.9662ms)
+✔ "excluir" inativa a questão, que continua no banco (Quadro 31) (1455.4517ms)
+✔ não existe rota de exclusão física (954.0236ms)
+✔ questão em avaliação publicada não pode ser excluída (UC05 A1) (914.7397ms)
+✔ questão só em avaliação rascunho pode ser inativada (883.1731ms)
+✔ questão inativada pode ser reativada (814.6664ms)
+✔ id inexistente ou inválido não quebra a API (918.7756ms)
+✔ somente o estudante acessa a área de realização (1440.693ms)
+✔ privada aparece só para quem está APROVADO em uma turma vinculada (1145.5445ms)
+✔ solicitação pendente ou recusada não dá acesso (1154.9392ms)
+✔ pública aparece para qualquer estudante, sem turma (P-19) (1130.7314ms)
+✔ avaliação em rascunho ou arquivada não aparece (1001.2364ms)
+✔ o estudante nunca recebe gabarito (DT13) (1173.6172ms)
+✔ A1: avaliação ainda não disponível aparece como AGENDADA e não inicia (1145.5829ms)
+✔ A2: período encerrado aparece como ENCERRADA e não inicia (1235.6659ms)
+✔ iniciar registra a tentativa e devolve as questões na ordem (1151.3098ms)
+✔ DT06: o prazo nunca passa do fim do período (1007.7941ms)
+✔ P-04: iniciar de novo continua a mesma tentativa, e não cria outra (1021.7919ms)
+✔ P-04: depois de finalizar, não dá para refazer (1142.3401ms)
+✔ cada estudante tem a própria tentativa (1365.6453ms)
+✔ iniciar trava a avaliação para o professor (P-15a) (1255.4402ms)
+✔ salvar respostas grava objetiva e discursiva, e informa o horário do salvamento (1185.3235ms)
+✔ salvar de novo a mesma questão atualiza a resposta, sem duplicar (UPSERT) (1151.3825ms)
+✔ trocar a alternativa marcada substitui a anterior (1286.6547ms)
+✔ retomar devolve as respostas já salvas (UC09 A2) (1148.865ms)
+✔ resposta para questão de fora da prova ou alternativa de outra questão é recusada (1227.6044ms)
+✔ um estudante não salva na tentativa de outro (1139.1932ms)
+✔ não dá para salvar sem ter iniciado (979.9842ms)
+✔ finalizar encerra a tentativa e preserva as respostas (RN06) (1108.1815ms)
+✔ a entrega pode trazer respostas ainda não salvas (1147.0756ms)
+✔ depois de finalizar, não se salva mais nada (1126.3525ms)
+✔ finalizar duas vezes não quebra nem muda a primeira entrega (1020.7818ms)
+✔ A4: passado o prazo, a tentativa é encerrada como TEMPO_ESGOTADO (1193.7119ms)
+✔ A4: retomar depois do prazo mostra a tentativa encerrada (1198.6604ms)
+✔ A4: finalizar depois do prazo devolve o encerramento por tempo (1144.4394ms)
+✔ quem começou continua podendo entregar mesmo se o professor arquivar a avaliação (1149.9791ms)
+✔ nenhuma resposta é apagada em todo o fluxo (1039.5588ms)
+✔ sem liberação, o resultado não traz nota nem indicador nenhum (2189.8818ms)
+✔ liberado, o estudante vê a própria nota — e só isso, por padrão (1602.3286ms)
+✔ prova de outro estudante e prova não feita não devolvem resultado (1786.0969ms)
+✔ o gabarito só vai quando o professor marca a opção (1425.07ms)
+✔ os indicadores da turma só aparecem a partir do mínimo de provas corrigidas (1980.7613ms)
+✔ com provas suficientes, os indicadores vêm anônimos (2608.618ms)
+✔ a comparação é da turma do estudante, não da avaliação inteira (5852.2177ms)
+✔ a prova guarda a turma em que foi feita (1531.917ms)
+✔ cada indicador respeita a sua caixa de seleção (2349.0439ms)
+✔ a divulgação é do professor dono e pode mudar depois de liberar (1431.7742ms)
+✔ a avaliação nasce sem divulgar nada além da nota (1192.6448ms)
+✔ prova em andamento não tem resultado, mesmo com a avaliação liberada (1783.9891ms)
+✔ GET /api/saude confirma API online e banco conectado com a migração 001 aplicada (106.5233ms)
+✔ rota inexistente da API devolve 404 no formato padrão (6.7581ms)
+[banco] conexão ociosa perdida: simulação: terminating connection
+✔ JSON malformado devolve 400 com mensagem legível (17.6596ms)
+✔ regressão: conexão ociosa perdida no pool não derruba a API (5.6891ms)
+✔ resposta não expõe o cabeçalho X-Powered-By (4.9369ms)
+✔ somente o estudante vinculado abre a turma; os demais recebem 404 (1540.7909ms)
+✔ o estudante continua sem ver o código de acesso nem os colegas (989.4304ms)
+✔ a turma lista as avaliações vinculadas a ela, e só elas (1127.9864ms)
+✔ avaliação em rascunho não aparece para o estudante (954.2323ms)
+✔ a situação distingue o que está aberto, agendado, encerrado e entregue (1193.2759ms)
+✔ P-07: a nota só aparece na turma depois de o professor liberar (1159.323ms)
+✔ o gabarito nunca acompanha a listagem da turma (1095.2032ms)
+✔ quem está aguardando aprovação vê a turma, mas não as provas (1092.2348ms)
+✔ turma inativada continua acessível, marcada como encerrada (1037.0086ms)
+✔ o estudante cancela a própria inscrição e a turma sai da lista dele (967.4182ms)
+✔ sair é exclusão lógica: o vínculo continua no banco, com a data (976.2193ms)
+✔ quem saiu deixa de contar como estudante da turma para o professor (984.0627ms)
+✔ a prova que ele já fez continua registrada com o professor (1059.3568ms)
+✔ não dá para sair com prova em andamento na turma (1031.7673ms)
+✔ depois de sair, o estudante pode voltar com o código (1027.5102ms)
+✔ cancelar solicitação pendente também é sair (924.6282ms)
+✔ turma alheia, inexistente ou já abandonada não deixam sair (1127.2442ms)
+✔ só o estudante sai por esta rota (961.0014ms)
+✔ somente o professor administra turmas; estudante e admin recebem 403 (1728.0263ms)
+✔ somente o estudante entra em turma por código (1165.2983ms)
+✔ um professor não vê nem altera as turmas de outro (1142.4353ms)
+✔ o professor cria a turma e o sistema gera o código de acesso (UC06) (1022.6582ms)
+✔ nome é obrigatório (UC06, validação) (938.532ms)
+✔ os códigos gerados são únicos e não usam caracteres ambíguos (1260.8723ms)
+✔ o professor edita a turma (UC06 A1) (1051.4506ms)
+✔ gerar novo código invalida o anterior, e quem já entrou continua na turma (1385.6715ms)
+✔ entrada direta: o estudante informa o código e já participa da turma (UC06 A2) (1112.2631ms)
+✔ o código é aceito com minúsculas, espaços e hífen (1264.3874ms)
+✔ código inválido é recusado sem revelar nada (1043.7669ms)
+✔ entrar duas vezes é informado, sem duplicar o vínculo (1175.433ms)
+✔ com aprovação, a entrada vira solicitação pendente (UC06 A3) (1174.1371ms)
+✔ o professor aprova a solicitação e o estudante passa a participar (UC06 A3) (1251.1419ms)
+✔ o professor recusa, e o estudante não entra nem pode insistir (UC06 A4) (1167.0787ms)
+✔ o professor pode reverter uma recusa aprovando depois (1216.9866ms)
+✔ só se recusa quem está pendente; aprovar quem já participa é informado (1282.6768ms)
+✔ mudar para entrada direta não aprova sozinho quem estava pendente (1241.5695ms)
+✔ inativar preserva estudantes e bloqueia novas entradas (1447.8222ms)
+✔ turma inativa sai da lista padrão, aparece no filtro e pode ser reativada (986.4977ms)
+✔ não existe exclusão física de turma (1132.6152ms)
+✔ o estudante não vê o código nem os colegas (1384.5428ms)
+✔ tentativas de código em excesso são bloqueadas (429) (974.6771ms)
+✔ a normalização sobe para maiúsculas (1.6661ms)
+✔ espaços e hífens digitados são ignorados (0.258ms)
+✔ pontuação e acentos são descartados, não confundidos com letras (0.2414ms)
+✔ entrada vazia ou ausente não quebra a normalização (0.2597ms)
+✔ o código gerado tem oito caracteres do alfabeto permitido (1.6017ms)
+✔ o alfabeto evita os caracteres que se confundem ao ler (2.6848ms)
+✔ arredondar usa duas casas por padrão e aceita outra precisão (1.655ms)
+✔ arredondar devolve null para o que não é número (0.1817ms)
+✔ o resumo traz média, mediana, menor e maior (0.3409ms)
+✔ com quantidade ímpar, a mediana é o valor central (0.2239ms)
+✔ a mediana não se deixa puxar por uma nota fora da curva (0.3611ms)
+✔ sem notas o resumo é null, e não um monte de zeros (0.2279ms)
+✔ uma nota só é média, mediana, menor e maior ao mesmo tempo (1.2573ms)
+✔ o percentual é arredondado a uma casa (0.2573ms)
+✔ sem total não há percentual — null, nunca zero (0.2431ms)
+✔ cada percentual cai na sua faixa (0.4003ms)
+✔ o 100% entra na última faixa, que é fechada dos dois lados (0.2275ms)
+✔ percentual fora de 0 a 100 não pertence a faixa nenhuma (0.1657ms)
+✔ a distribuição sempre traz as cinco faixas, inclusive as vazias (0.3458ms)
+✔ sem provas, a distribuição é cinco faixas zeradas (0.285ms)
+✔ na objetiva o índice é a proporção de acertos (0.2122ms)
+✔ na discursiva o índice é a soma das notas sobre o total possível (0.1918ms)
+✔ sem provas corrigidas não há índice (0.3827ms)
+✔ discursiva valendo zero ponto não gera divisão por zero (0.1886ms)
+✔ os destaques vêm ordenados do melhor para o pior (0.7403ms)
+✔ DT60: a mesma questão nunca aparece nos dois lados (0.2492ms)
+✔ questão sem índice calculável fica fora dos dois destaques (0.3138ms)
+✔ sem questões, os destaques são listas vazias (0.2154ms)
+✔ com período longo, vale a duração da prova (4.9071ms)
+✔ começando perto do fim do período, vale o fim do período (0.2581ms)
+✔ quando os dois coincidem, o prazo é esse instante (1.4067ms)
+✔ o período já encerrado não devolve prazo no futuro (0.3265ms)
+✔ a duração conta em minutos, não em outra unidade (0.2601ms)
+✔ o tempo restante nunca é negativo (0.224ms)
+✔ no instante exato do prazo, a prova já acabou (0.2182ms)
+✔ estudante se autocadastra e já consegue entrar (1309.083ms)
+✔ o autocadastro ignora o perfil enviado: professor não se autocadastra (P-18) (764.3038ms)
+✔ o autocadastro não aceita a situação enviada pelo cliente (721.0897ms)
+✔ autocadastro com e-mail já usado devolve 409 com mensagem no campo (799.5188ms)
+✔ autocadastro valida nome, e-mail e senha (767.1463ms)
+✔ a senha do autocadastro é gravada como hash e nunca volta na resposta (917.2618ms)
+✔ somente o administrador lista usuários (1040.8465ms)
+✔ a listagem nunca inclui o hash da senha (737.2711ms)
+✔ a listagem filtra por perfil, por situação e por busca (769.8363ms)
+✔ a listagem pagina e informa o total (745.3525ms)
+✔ administrador cadastra professor, que passa a entrar no sistema (1051.9357ms)
+✔ administrador pode cadastrar já inativo, e essa conta não entra (975.5847ms)
+✔ perfil fora dos três permitidos é recusado (P-17) (727.4273ms)
+✔ professor e estudante não conseguem criar contas (925.261ms)
+✔ administrador edita nome, e-mail e perfil de outro usuário (990.4406ms)
+✔ edição parcial altera só o campo enviado (822.0607ms)
+✔ edição sem nenhum campo é recusada (671.6315ms)
+✔ editar para um e-mail já usado devolve 409 (809.8007ms)
+✔ usuário inexistente devolve 404 na consulta e na edição (700.6585ms)
+✔ id não numérico devolve 400, não 500 (846.5481ms)
+✔ inativar é a "exclusão" do sistema: o registro continua no banco (701.9868ms)
+✔ usuário inativado perde o acesso imediatamente e não consegue entrar de novo (983.9146ms)
+✔ reativar devolve o acesso (964.7652ms)
+✔ nenhuma rota do módulo apaga registros fisicamente (730.9238ms)
+✔ administrador não pode inativar a própria conta (782.2276ms)
+✔ administrador não pode alterar o próprio perfil (721.6488ms)
+✔ o sistema nunca fica sem administrador ativo (810.8611ms)
+✔ rebaixar outro administrador é permitido (717.407ms)
+✔ qualquer usuário autenticado consulta e edita os próprios dados (685.8273ms)
+✔ editar os próprios dados não permite trocar de perfil nem de situação (833.8664ms)
+✔ "/eu" não é confundido com um id de usuário (661.5818ms)
+✔ trocar os próprios dados para um e-mail já usado devolve 409 (743.2782ms)
+✔ usuário troca a própria senha informando a senha atual (1268.8583ms)
+✔ a troca de senha exige a senha atual correta (1014.8249ms)
+✔ a nova senha precisa ter pelo menos 8 caracteres (889.4489ms)
+
+[email] SMTP não configurado — mensagem registrada no log (somente desenvolvimento)
+        Para: est@exemplo.com
+        Assunto: Redefinição de senha — Sistema de Avaliações
+Olá, Est. Teste.
+
+Recebemos um pedido para redefinir a senha da sua conta.
+Acesse o link abaixo para cadastrar uma nova senha:
+
+http://localhost:5173/redefinir-senha?token=zG4MuCSoktH0eHQSpate9V5coiGCD9IkHP0KmG1NDGI
+
+O link vale por 60 minutos e pode ser usado uma única vez.
+Se você não solicitou a redefinição, ignore esta mensagem: sua senha atual continua valendo.
+
+
+✔ trocar a própria senha invalida links de redefinição pendentes (1050.0471ms)
+✔ a troca de senha exige estar autenticado (560.757ms)
+✔ autocadastros em excesso a partir do mesmo endereço são bloqueados (762.3467ms)
+ℹ tests 349
+ℹ suites 0
+ℹ pass 349
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 347090.2409
+
+

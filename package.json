@@ -1,0 +1,17 @@
+{
+  "name": "sistema-avaliacoes",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Avaliune — sistema web de avaliações digitais com monitoramento e correção assistida por IA",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "npm --prefix backend ci && npm --prefix frontend ci --include=dev && npm --prefix frontend run build",
+    "start": "npm --prefix backend run setup && npm --prefix backend start",
+    "dev:api": "npm --prefix backend run dev",
+    "dev:site": "npm --prefix frontend run dev",
+    "test": "npm --prefix backend test && npm --prefix frontend test",
+    "lint": "npm --prefix backend run lint && npm --prefix frontend run lint"
+  }
+}

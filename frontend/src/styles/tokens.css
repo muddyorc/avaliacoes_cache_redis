@@ -1,0 +1,233 @@
+/* Tokens da identidade visual (FRONTEND_DESIGN_SYSTEM.md).
+ *
+ * Este arquivo é a única fonte de cor, sombra, raio, espaçamento e tipografia do
+ * sistema. Nenhum componente deve escrever um valor de cor direto: tudo passa por
+ * uma variável daqui, e é isso que permite trocar o tema sem reescrever tela alguma.
+ *
+ * Temas: `:root` traz o claro; `[data-tema='escuro']` traz o escuro. Quem não
+ * escolheu tema segue a preferência do sistema operacional, pela media query no
+ * final — por isso ela só vale quando `data-tema` não está fixado em 'claro'.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* ----------------------------------------------------------- rampa de azul
+     A identidade é azul. Os tons abaixo são a origem de toda cor de marca; as
+     telas usam os papéis (--cor-primaria e afins), nunca a rampa diretamente. */
+  --azul-50: #eef4fd;
+  --azul-100: #d9e7fb;
+  --azul-200: #b6cef6;
+  --azul-300: #8fb8f6;
+  --azul-400: #4f87e0;
+  --azul-500: #2a6fd4;
+  --azul-600: #1a5fbf;
+  --azul-700: #1558b0;
+  --azul-800: #114a94;
+  --azul-900: #0d3a74;
+
+  /* --------------------------------------------------------------- papéis */
+  --cor-primaria: var(--azul-700);
+  --cor-primaria-hover: var(--azul-800);
+  --cor-primaria-ativa: var(--azul-900);
+  --cor-primaria-suave: var(--azul-50);
+  --cor-primaria-contorno: var(--azul-200);
+  --cor-sobre-primaria: #ffffff;
+  /* Capa de cartão: superfície grande na cor da marca. Tem token próprio porque no
+     escuro ela não pode ser o azul claro dos botões — brilharia demais. */
+  --cor-capa: var(--azul-700);
+  --cor-sobre-capa: #ffffff;
+
+  --cor-fundo: #f6f8fb;
+  --cor-superficie: #ffffff;
+  --cor-superficie-alt: #f1f4f9;
+  --cor-superficie-elevada: #ffffff;
+  --cor-borda: #dbe2ea;
+  --cor-borda-forte: #c3ccd8;
+
+  --cor-titulo: #10263f;
+  --cor-texto: #16212e;
+  --cor-texto-suave: #55606e;
+  --cor-texto-fraco: #78838f;
+
+  /* Estados. Cada um tem a cor da tinta, um fundo e uma borda, para avisos e
+     selos ficarem legíveis nos dois temas sem depender só do matiz. */
+  --cor-sucesso: #1b7a43;
+  --cor-sucesso-fundo: #e9f6ee;
+  --cor-sucesso-borda: #b7e0c6;
+  --cor-alerta: #8a5a00;
+  --cor-alerta-fundo: #fdf6e7;
+  --cor-alerta-borda: #eed9a6;
+  --cor-erro: #b42318;
+  --cor-erro-fundo: #fdf1f0;
+  --cor-erro-borda: #f2c2bd;
+  --cor-info: var(--azul-700);
+  --cor-info-fundo: var(--azul-50);
+  --cor-info-borda: var(--azul-200);
+
+  /* Marca dos gráficos: validada contra a superfície de cada tema (contraste,
+     luminosidade e croma). Não usar --cor-primaria em barra de gráfico. */
+  --cor-grafico: #2a6fd4;
+  --cor-grafico-suave: rgb(42 111 212 / 10%);
+  --cor-grade: #e4e9f0;
+
+  /* ----------------------------------------------------------- tipografia */
+  --fonte: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --texto-pp: 0.75rem;
+  --texto-p: 0.875rem;
+  --texto-m: 1rem;
+  --texto-g: 1.125rem;
+  --texto-gg: 1.375rem;
+  --texto-ggg: 1.75rem;
+  --peso-normal: 400;
+  --peso-medio: 500;
+  --peso-forte: 600;
+  --peso-destaque: 700;
+
+  /* ------------------------------------------------ espaçamento (escala 4px) */
+  --esp-1: 0.25rem;
+  --esp-2: 0.5rem;
+  --esp-3: 1rem;
+  --esp-4: 1.5rem;
+  --esp-5: 2.5rem;
+  --esp-6: 3.5rem;
+
+  /* ------------------------------------------------------ forma e elevação */
+  --raio-p: 6px;
+  --raio-m: 10px;
+  --raio-g: 16px;
+  --raio-completo: 999px;
+
+  --sombra-1: 0 1px 2px rgb(16 24 40 / 6%), 0 1px 3px rgb(16 24 40 / 8%);
+  --sombra-2: 0 2px 6px rgb(16 24 40 / 8%), 0 8px 20px rgb(16 24 40 / 8%);
+  --sombra-3: 0 12px 32px rgb(16 24 40 / 16%);
+  --foco-anel: 0 0 0 3px rgb(21 88 176 / 35%);
+
+  /* ------------------------------------------------------------- layout */
+  --topo-altura: 4rem;
+  --lateral-largura: 16rem;
+  /* Largura do trilho: a lateral fechada, só com os ícones. */
+  --lateral-recolhida: 4.5rem;
+  --largura-conteudo: 40rem;
+  --largura-larga: 68rem;
+
+  /* Aliases dos nomes antigos, para as telas ainda não migradas continuarem
+     funcionando — e já nascerem com modo escuro. Remover quando a última tela
+     tiver sido convertida. */
+  --cor-tinta: var(--cor-primaria);
+  --cor-tinta-escura: var(--cor-primaria-hover);
+  --raio: var(--raio-p);
+}
+
+/* ------------------------------------------------------------- modo escuro */
+
+/* O azul da marca clareia no escuro: um azul escuro sobre fundo escuro não teria
+   contraste. Por isso o texto sobre a cor primária passa a ser escuro. */
+:root[data-tema='escuro'] {
+  color-scheme: dark;
+
+  --cor-primaria: var(--azul-300);
+  --cor-primaria-hover: #aecbfa;
+  --cor-primaria-ativa: #c7dcfc;
+  --cor-primaria-suave: #18293f;
+  --cor-primaria-contorno: #2f4763;
+  --cor-sobre-primaria: #0c1b2e;
+  --cor-capa: #1b3252;
+  --cor-sobre-capa: #dbe8fb;
+
+  --cor-fundo: #0e151e;
+  --cor-superficie: #161f2a;
+  --cor-superficie-alt: #1d2733;
+  --cor-superficie-elevada: #1f2937;
+  --cor-borda: #2a3644;
+  --cor-borda-forte: #3a4859;
+
+  --cor-titulo: #e7eef6;
+  --cor-texto: #e7eef6;
+  --cor-texto-suave: #a3b1c2;
+  --cor-texto-fraco: #8493a5;
+
+  --cor-sucesso: #5dd08a;
+  --cor-sucesso-fundo: #13291d;
+  --cor-sucesso-borda: #2f5d41;
+  --cor-alerta: #e8b458;
+  --cor-alerta-fundo: #2a2214;
+  --cor-alerta-borda: #5c4a24;
+  --cor-erro: #f28b82;
+  --cor-erro-fundo: #2c1a18;
+  --cor-erro-borda: #5e332e;
+  --cor-info: var(--azul-300);
+  --cor-info-fundo: #18293f;
+  --cor-info-borda: #2f4763;
+
+  --cor-grafico: #4f87e0;
+  --cor-grafico-suave: rgb(79 135 224 / 16%);
+  --cor-grade: #2a3644;
+
+  --sombra-1: 0 1px 2px rgb(0 0 0 / 40%);
+  --sombra-2: 0 2px 6px rgb(0 0 0 / 45%), 0 8px 20px rgb(0 0 0 / 35%);
+  --sombra-3: 0 12px 32px rgb(0 0 0 / 55%);
+  --foco-anel: 0 0 0 3px rgb(143 184 246 / 45%);
+}
+
+/* Sem escolha explícita, vale a preferência do sistema. A guarda `:not([data-tema='claro'])`
+   existe para que escolher o claro na aplicação vença o sistema em modo escuro. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema='claro']) {
+    color-scheme: dark;
+
+    --cor-primaria: var(--azul-300);
+    --cor-primaria-hover: #aecbfa;
+    --cor-primaria-ativa: #c7dcfc;
+    --cor-primaria-suave: #18293f;
+    --cor-primaria-contorno: #2f4763;
+    --cor-sobre-primaria: #0c1b2e;
+    --cor-capa: #1b3252;
+    --cor-sobre-capa: #dbe8fb;
+
+    --cor-fundo: #0e151e;
+    --cor-superficie: #161f2a;
+    --cor-superficie-alt: #1d2733;
+    --cor-superficie-elevada: #1f2937;
+    --cor-borda: #2a3644;
+    --cor-borda-forte: #3a4859;
+
+    --cor-titulo: #e7eef6;
+    --cor-texto: #e7eef6;
+    --cor-texto-suave: #a3b1c2;
+    --cor-texto-fraco: #8493a5;
+
+    --cor-sucesso: #5dd08a;
+    --cor-sucesso-fundo: #13291d;
+    --cor-sucesso-borda: #2f5d41;
+    --cor-alerta: #e8b458;
+    --cor-alerta-fundo: #2a2214;
+    --cor-alerta-borda: #5c4a24;
+    --cor-erro: #f28b82;
+    --cor-erro-fundo: #2c1a18;
+    --cor-erro-borda: #5e332e;
+    --cor-info: var(--azul-300);
+    --cor-info-fundo: #18293f;
+    --cor-info-borda: #2f4763;
+
+    --cor-grafico: #4f87e0;
+    --cor-grafico-suave: rgb(79 135 224 / 16%);
+    --cor-grade: #2a3644;
+
+    --sombra-1: 0 1px 2px rgb(0 0 0 / 40%);
+    --sombra-2: 0 2px 6px rgb(0 0 0 / 45%), 0 8px 20px rgb(0 0 0 / 35%);
+    --sombra-3: 0 12px 32px rgb(0 0 0 / 55%);
+    --foco-anel: 0 0 0 3px rgb(143 184 246 / 45%);
+  }
+}
+
+/* Quem prefere menos movimento não recebe transição de tema nem animação. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

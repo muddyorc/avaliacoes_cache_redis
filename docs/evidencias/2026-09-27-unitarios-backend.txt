@@ -1,0 +1,51 @@
+Data da execucao: 2026-09-27T21:36:01.660Z
+Node v24.21.0
+1930470 Interface do Design System, congelamento das questoes (P-22), divulgacao dos resultados (P-23) e saida da turma (P-24)
+
+
+> avaliacoes-backend@0.1.0 test:unit
+> node --test "tests/unitarios/*.test.js"
+
+✔ a normalização sobe para maiúsculas (1.6573ms)
+✔ espaços e hífens digitados são ignorados (0.2523ms)
+✔ pontuação e acentos são descartados, não confundidos com letras (0.2287ms)
+✔ entrada vazia ou ausente não quebra a normalização (0.2466ms)
+✔ o código gerado tem oito caracteres do alfabeto permitido (1.5801ms)
+✔ o alfabeto evita os caracteres que se confundem ao ler (2.572ms)
+✔ arredondar usa duas casas por padrão e aceita outra precisão (3.1709ms)
+✔ arredondar devolve null para o que não é número (0.2359ms)
+✔ o resumo traz média, mediana, menor e maior (0.4307ms)
+✔ com quantidade ímpar, a mediana é o valor central (0.2625ms)
+✔ a mediana não se deixa puxar por uma nota fora da curva (0.3732ms)
+✔ sem notas o resumo é null, e não um monte de zeros (0.2813ms)
+✔ uma nota só é média, mediana, menor e maior ao mesmo tempo (3.0087ms)
+✔ o percentual é arredondado a uma casa (0.2784ms)
+✔ sem total não há percentual — null, nunca zero (0.2586ms)
+✔ cada percentual cai na sua faixa (0.46ms)
+✔ o 100% entra na última faixa, que é fechada dos dois lados (0.2705ms)
+✔ percentual fora de 0 a 100 não pertence a faixa nenhuma (0.1864ms)
+✔ a distribuição sempre traz as cinco faixas, inclusive as vazias (0.3453ms)
+✔ sem provas, a distribuição é cinco faixas zeradas (0.3692ms)
+✔ na objetiva o índice é a proporção de acertos (0.2383ms)
+✔ na discursiva o índice é a soma das notas sobre o total possível (0.1816ms)
+✔ sem provas corrigidas não há índice (1.4331ms)
+✔ discursiva valendo zero ponto não gera divisão por zero (0.2007ms)
+✔ os destaques vêm ordenados do melhor para o pior (0.588ms)
+✔ DT60: a mesma questão nunca aparece nos dois lados (0.2574ms)
+✔ questão sem índice calculável fica fora dos dois destaques (0.3271ms)
+✔ sem questões, os destaques são listas vazias (0.2302ms)
+✔ com período longo, vale a duração da prova (3.0824ms)
+✔ começando perto do fim do período, vale o fim do período (0.3261ms)
+✔ quando os dois coincidem, o prazo é esse instante (1.5187ms)
+✔ o período já encerrado não devolve prazo no futuro (0.3579ms)
+✔ a duração conta em minutos, não em outra unidade (0.2725ms)
+✔ o tempo restante nunca é negativo (0.2837ms)
+✔ no instante exato do prazo, a prova já acabou (0.2655ms)
+ℹ tests 35
+ℹ suites 0
+ℹ pass 35
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1324.9538
