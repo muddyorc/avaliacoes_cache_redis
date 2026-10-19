@@ -1,330 +1,232 @@
-# Sistema Web de Gerenciamento e Auxílio à Correção de Avaliações Digitais e Monitoramento Anticola
+# Avaliune — avaliações digitais, com cache em Redis
 
-Plataforma web em que o professor cria, aplica e acompanha avaliações digitais, e o estudante
-as realiza pelo navegador, com salvamento automático das respostas.
+Aplicação web onde professores montam provas, aplicam a uma turma e corrigem; e estudantes
+fazem a prova pelo navegador e veem a própria nota quando o professor libera.
 
-Trabalho Final de Curso II — Universidade de Rio Verde, Faculdade de Engenharia de Software (2026).
-Autor: Julio Cezar Rodrigues Correia. Orientador: Prof. Esp. Vinícius Félix de Paula.
+Este repositório é a versão do sistema com uma **camada de cache em Redis** acrescentada por
+cima do banco de dados, para reduzir o trabalho do PostgreSQL durante a prova.
 
-## Sobre o projeto
+---
 
-O processo de avaliação costuma ficar espalhado por várias ferramentas: editor de texto para
-escrever as questões, ambiente virtual para aplicar a prova e planilha para analisar as notas.
-Este sistema reúne o ciclo inteiro em um só lugar:
+## O que o sistema faz
 
-- um **banco de questões** reutilizável, com objetivas e discursivas;
-- **avaliações** montadas a partir desse banco, com período, duração e regras de aplicação;
-- **turmas** com código de acesso, de entrada direta ou mediante aprovação do professor;
-- **realização da prova** com cronômetro controlado pelo servidor e salvamento automático;
-- **correção** automática das objetivas e correção assistida por **Inteligência Artificial**
-  nas discursivas, sempre com a palavra final do professor;
-- **resultados e indicadores** de desempenho, da nota de um estudante ao panorama da turma.
+São três perfis:
 
-Como diferencial, o sistema registra eventos do navegador durante a prova — troca de aba, perda
-de foco e atalhos de teclado — para dar ao professor informações sobre a execução da avaliação,
-em linguagem neutra e sem acusações automáticas.
+- **Administrador** — cadastra professores.
+- **Professor** — monta um banco de questões (objetivas e discursivas), junta questões numa
+  prova, aplica a prova a uma turma, acompanha quem está fazendo, corrige e libera as notas.
+  Na correção das discursivas pode pedir uma sugestão de nota a uma IA, que é só sugestão: quem
+  dá a nota é sempre o professor.
+- **Estudante** — entra na turma por um código, faz a prova em tela cheia, com salvamento
+  automático, e vê a nota depois que o professor libera.
 
-## Estado atual
+Enquanto a prova acontece, o navegador avisa o servidor quando a janela perde o foco, quando o
+estudante troca de aba ou sai da tela cheia. O sistema **registra** esses acontecimentos — ele não
+acusa ninguém de nada, e quem conta e decide é sempre o servidor, nunca a tela.
 
-Desenvolvimento incremental, uma etapa por vez. **Os treze requisitos funcionais estão
-implementados**: o ciclo funciona de ponta a ponta, da criação da questão até a nota liberada
-ao estudante, passando pelo monitoramento da prova e pela correção assistida por IA.
+Feito com React no navegador, Express no servidor e PostgreSQL no banco, com SQL escrito à mão.
+Tudo em português: variáveis, funções, tabelas, rotas e comentários.
 
-| Requisito | O que faz | Situação |
-|---|---|---|
-| RF01 | Autenticar usuários, recuperar senha, registrar acessos | ✅ |
-| RF02 | Gerenciar usuários e perfis; autocadastro do estudante | ✅ |
-| RF03 | Criar avaliações | ✅ |
-| RF04 | Editar, publicar, arquivar, duplicar e excluir avaliações | ✅ |
-| RF05 | Gerenciar o banco de questões | ✅ |
-| RF06 | Gerenciar turmas e o ingresso por código | ✅ |
-| RF07 | Vincular avaliações às turmas | ✅ |
-| RF08 | Realizar avaliações | ✅ |
-| RF09 | Salvar respostas automaticamente | ✅ |
-| RF10 | Monitorar a integridade da avaliação | ✅ |
-| RF11 | Corrigir e auxiliar na correção, com sugestão de nota por IA | ✅ |
-| RF12 | Dashboard de desempenho | ✅ |
-| RF13 | Consultar resultados | ✅ |
+---
 
-**453 testes automatizados**, todos passando — 431 no backend e 22 no frontend —, além de
-roteiros de verificação no navegador a cada etapa. Falta a etapa de finalização: revisão de
-segurança, verificação nos navegadores Chromium e build de produção.
+## Como rodar
 
-## Funcionalidades por perfil
+Você precisa de **Node.js 22 ou mais novo** e **PostgreSQL**.
 
-**Professor**
-- Banco de questões: objetivas (2 a 10 alternativas, exatamente uma correta) e discursivas
-  (critérios de correção e, se o professor quiser, uma resposta esperada), organizadas por tema.
-- Avaliações: título, instruções, período, duração, monitoramento e questões do banco — ou
-  criadas na hora, indo também para o banco.
-- Publicação com verificação de pendências; arquivar, duplicar e excluir logicamente.
-- Turmas com código de acesso; aprovar ou recusar solicitações de entrada.
-- **Fazer a própria prova como teste**, com cronômetro e correção, sem gravar nada.
-- Correção: as objetivas o sistema corrige sozinho; nas discursivas, a **IA analisa a resposta
-  ao abrir a prova** e sugere nota com justificativa — o professor **aprova** ou **recusa**, e
-  recusar devolve a correção manual daquela questão. A nota nunca é atribuída sozinha. A nota
-  só chega ao estudante quando o professor **libera os resultados**.
-- Monitoramento da prova: perda de foco, troca de aba e atalhos de teclado, com limite
-  opcional de ocorrências. O relatório vem com o aviso de leitura **antes** dos números — os
-  registros descrevem o que o navegador observou, não acusam ninguém.
-- Resultados por turma: um quadro estudante × avaliação, com quem ainda não fez, o que falta
-  corrigir e o histórico de cada estudante, prova por prova.
-- Dashboard de desempenho: média, mediana, distribuição das notas, estudantes abaixo da média e
-  o índice de acerto de cada questão — por avaliação ou por turma. Cada gráfico vem com a
-  tabela dos mesmos números, e o que ainda não tem dado é dito com todas as letras, em vez de
-  aparecer como zero.
-
-**Estudante**
-- Autocadastro e edição dos próprios dados.
-- Entrada em turmas pelo código.
-- Realização da prova com cronômetro, salvamento automático e retomada após queda de conexão.
-- Aviso, antes de começar, do que a prova registra e do que o sistema **não** vê.
-- Nota da prova, quando o professor libera os resultados, e — se ele marcar — a correção
-  questão a questão e indicadores anônimos da turma.
-- Cancelamento da própria inscrição na turma.
-
-**Administrador**
-- Cadastro, edição, ativação e inativação de contas; definição de perfis.
-
-## Decisões de projeto que valem destacar
-
-- **Nenhum registro é apagado.** Usuários, turmas, questões, avaliações, tentativas e respostas
-  são inativados, arquivados ou marcados como excluídos — o histórico é sempre preservado.
-- **A autorização acontece no servidor.** Esconder um botão não protege nada: cada rota confere
-  perfil e propriedade. O gabarito nunca é enviado ao estudante.
-- **O tempo da prova é do servidor.** O prazo é `min(início + duração, fim do período)`, gravado
-  no banco. O cronômetro da tela é apenas um visor; mudar o relógio do computador não muda nada.
-- **Uma tentativa por estudante**, garantida por restrição no banco.
-- **Depois que o primeiro estudante inicia**, a avaliação fica estruturalmente bloqueada: o
-  professor pode consultar, arquivar e duplicar, mas não alterar.
-- **Sessão em cookie `httpOnly`**, nunca em `localStorage`; senhas apenas como hash `bcrypt`;
-  tokens de recuperação guardados só como hash, com validade e uso único.
-- **A IA sugere, o professor decide.** Entre a sugestão e a nota registrada existe sempre um
-  clique do professor. A resposta do modelo é validada antes de chegar à tela: nota fora do
-  intervalo da questão é descartada, não ajustada.
-- **Nada que identifique o estudante sai do sistema.** O que vai para a IA é o enunciado, o
-  tema, os critérios e a resposta — nome, e-mail e identificador não são nem parâmetros da
-  função. A resposta do estudante viaja entre delimitadores, e a instrução manda ignorar
-  ordens vindas de dentro dela.
-- **Nenhum teste automatizado consulta a IA.** Uma trava substitui o `fetch` global nos testes
-  e recusa qualquer saída para a internet: a suíte não gasta crédito nem depende da resposta
-  de um modelo, que varia entre chamadas.
-
-## Tecnologias
-
-| Camada | Tecnologia |
-|---|---|
-| Frontend | React 19 + Vite 8 + React Router 7, JavaScript, CSS puro; `recharts` nos gráficos |
-| Backend | Node.js 22+ e Express 5, JavaScript (ESM) |
-| Banco | PostgreSQL 16 ou superior, SQL puro com `pg`, migrações `.sql` numeradas |
-| Sessão | JWT em cookie `httpOnly`, senhas com `bcryptjs` |
-| Validação | `zod`; proteção contra abuso com `express-rate-limit`; e-mail com `nodemailer` |
-| IA | OpenAI (GPT), Google (Gemini) ou Anthropic (Claude), escolhidos por variável de ambiente; sem chave, um provedor simulado que anuncia a simulação |
-| Testes | `node:test` e `supertest`, em banco separado do de desenvolvimento |
-
-```
-Navegador (React) ──/api (mesma origem)──► API Express ──► PostgreSQL
-```
-
-## Como executar
-
-### Pré-requisitos
-
-- Node.js 22 ou superior
-- PostgreSQL 16 ou superior
-
-> Docker não é necessário. O `docker-compose.yml` continua no repositório, mas não é mantido.
-
-### 1. Configurar
+**1. Configure.** Copie o arquivo de exemplo e preencha:
 
 ```bash
-git clone https://github.com/muddyorc/TFC.git
-cd TFC
 cp .env.example .env
 ```
 
-Edite o `.env`. O arquivo **nunca** é versionado; o repositório traz apenas o `.env.example`
-com os nomes das variáveis. Defina no mínimo:
-
-| Variável | O que colocar |
-|---|---|
-| `DATABASE_URL` | Conexão do banco de desenvolvimento |
-| `DATABASE_URL_TESTE` | Conexão do banco **de testes** — precisa ser outro banco |
-| `JWT_SECRET` | Valor longo e aleatório |
-| `ADMIN_SENHA` | Senha do administrador inicial (mínimo de 8 caracteres) |
-
-Para a correção assistida por IA, opcionalmente:
-
-| Variável | O que colocar |
-|---|---|
-| `IA_PROVEDOR` | `openai`, `gemini`, `anthropic` ou `simulado` (padrão) |
-| `IA_API_KEY` | A chave do provedor escolhido |
-| `IA_MODELO` | Opcional; sem ela, cada provedor usa o modelo padrão do código |
-
-Sem chave, o sistema usa o provedor **simulado**: o fluxo de aprovar e recusar funciona igual,
-e a justificativa diz, com todas as letras, que a sugestão não veio de uma IA.
+O mínimo a preencher são três linhas:
 
 ```bash
-# Gera um JWT_SECRET
+DATABASE_URL=postgresql://usuario:senha@localhost:5432/avaliacoes
+DATABASE_URL_TESTE=postgresql://usuario:senha@localhost:5432/avaliacoes_teste
+JWT_SECRET=um_valor_longo_e_aleatorio
+```
+
+Para gerar o `JWT_SECRET`:
+
+```bash
 node -e "console.log(require('node:crypto').randomBytes(48).toString('base64url'))"
 ```
 
-### 2. Criar os bancos
-
-Com um superusuário do PostgreSQL:
-
-```sql
-CREATE ROLE avaliacoes LOGIN PASSWORD 'a_senha_que_voce_escolheu';
-CREATE DATABASE avaliacoes       OWNER avaliacoes ENCODING 'UTF8';
-CREATE DATABASE avaliacoes_teste OWNER avaliacoes ENCODING 'UTF8';
-
--- Permite que `npm test` recrie o banco de testes sozinho.
-ALTER ROLE avaliacoes CREATEDB;
-```
-
-### 3. Executar
+**2. Instale e prepare o banco:**
 
 ```bash
-# Terminal 1 — API
-cd backend
-npm install
-npm run setup      # aplica as migrações e cria o administrador inicial
-npm run dev        # http://localhost:3000
-
-# Terminal 2 — interface
-cd frontend
-npm install
-npm run dev        # http://localhost:5173
+npm --prefix backend install
+npm --prefix frontend install
+npm --prefix backend run setup     # cria as tabelas e o administrador inicial
 ```
 
-Abra http://localhost:5173 e entre com o administrador definido no `.env`. Por ele, cadastre um
-professor; o estudante pode criar a própria conta pelo link **Criar conta**.
+**3. Suba, em dois terminais:**
 
-### 4. Cache de leitura em Redis (opcional)
+```bash
+npm run dev:api      # API em http://localhost:3000
+npm run dev:site     # site em http://localhost:5173
+```
 
-**O sistema funciona sem Redis.** Sem servidor no ar, a API lê tudo do PostgreSQL, avisa uma vez
-no log e segue — nenhuma tela muda de comportamento. Para ligar a camada:
+Abra http://localhost:5173 e entre com o e-mail e a senha de administrador que você pôs no
+`.env`. Por ele você cadastra um professor; o estudante cria a própria conta pelo link
+**Criar conta**.
+
+---
+
+## O cache em Redis
+
+### O problema
+
+Quando o estudante está fazendo a prova, a tela salva as respostas sozinha a cada 10 segundos. A
+cada salvamento, e a cada vez que a página é retomada, o servidor executa a mesma função —
+`questoesDaProva` — que faz **3 consultas** ao PostgreSQL para montar a estrutura da prova:
+enunciados, alternativas e pontuações.
+
+Numa turma de 40 estudantes fazendo uma prova de uma hora, isso dá cerca de **14.400 execuções** e
+**43.200 consultas**, todas pedindo exatamente a mesma coisa.
+
+### O que guardamos
+
+Uma chave por prova, com a estrutura inteira em JSON:
+
+```
+prova:v1:42:estrutura     →   [ { questaoId: 7, enunciado: "...", alternativas: [...] }, ... ]
+```
+
+O `v1` é a versão do formato: se um dia o JSON mudar de desenho, é só passar para `v2` e as chaves
+velhas somem sozinhas, sem precisar limpar o Redis na mão.
+
+O prazo de validade é de **6 horas**.
+
+### Como funciona
+
+É o padrão **cache-aside**, que em código fica assim:
+
+```js
+// procura no cache primeiro
+const guardado = await buscar(chave);
+if (guardado) return guardado;              // HIT — nenhuma consulta ao banco
+
+// não achou: vai na fonte da verdade
+const estrutura = await (3 consultas ao PostgreSQL);   // MISS
+
+// e guarda para a próxima
+await guardar(chave, estrutura, 6 * 60 * 60);
+return estrutura;
+```
+
+### Por que não existe invalidação
+
+Normalmente, a parte difícil de um cache é lembrar de apagar a cópia quando o dado muda. **Aqui
+não existe esse problema**, e por um motivo concreto do sistema:
+
+Quando o **primeiro** estudante inicia a prova, ela **congela** — guarda a própria cópia das
+questões. Dali em diante, o professor não consegue mais alterar nada: há duas travas no código
+que recusam a edição assim que existe uma tentativa. Ou seja, **a estrutura de uma prova em
+andamento nunca muda**. Não há o que invalidar.
+
+Por isso só guardamos no cache a prova **já congelada**. Antes do congelamento a prova ainda
+acompanha o banco de questões e o professor pode mexer nela à vontade — e aí guardar seria
+arrumar encrenca.
+
+### Se o Redis cair
+
+O sistema continua funcionando normalmente, lendo tudo do PostgreSQL. O cache é um atalho, não
+uma dependência: nenhuma função dele lança erro para quem chamou, e qualquer problema — servidor
+fora do ar, demora, valor estragado — vira simplesmente "não achei". Aparece um aviso no log, uma
+vez só, e a vida segue.
+
+Depois de uma falha ele para de tentar por 30 segundos. Sem essa pausa, com o Redis fora do ar
+toda requisição ficaria esperando a conexão dar erro, e o atalho viraria pedágio.
+
+### Para ligar
+
+O Redis é opcional. Para subir:
 
 ```bash
 docker run -d --name redis -p 6379:6379 redis:7
-docker exec -it redis redis-cli     # PING deve responder PONG
+docker exec -it redis redis-cli PING      # responde PONG
 ```
 
-O que é cacheado: a **estrutura da prova** (enunciados, alternativas e pontuações como o
-estudante as vê), na chave `prova:v1:{avaliacaoId}:estrutura`, em JSON, com validade de 6 h.
+E no `.env`:
 
-Por que essa operação: é a que o salvamento automático executa a cada 10 s por estudante, e
-numa prova **congelada** o resultado é imutável — depois que o primeiro estudante inicia, a prova
-guarda a própria cópia das questões e nada mais escreve nela (`exigirEditavel` barra edição com
-tentativas existentes). Por isso a chave **não precisa de invalidação**: o TTL existe só para não
-ocupar memória para sempre. Prova ainda **não congelada** não entra no cache, porque aí a
-estrutura acompanha o banco de questões e pode mudar a qualquer momento.
+```bash
+CACHE_ATIVO=true
+REDIS_URL=redis://localhost:6379
+```
 
-Medindo o antes e o depois com o mesmo comando:
+### Quanto melhorou
+
+Medimos a mesma operação 1.000 vezes seguidas, com o mesmo comando e o mesmo cenário (uma prova de
+40 questões), mudando só o `CACHE_ATIVO`:
 
 ```bash
 cd backend
-NODE_ENV=test CACHE_ATIVO=false npm run medir    # baseline: lê sempre do PostgreSQL
-NODE_ENV=test CACHE_ATIVO=true  npm run medir    # com a camada no ar
+NODE_ENV=test CACHE_ATIVO=false npm run medir     # antes
+NODE_ENV=test CACHE_ATIVO=true  npm run medir     # depois
 ```
 
-O `scripts/medir.js` chama uma única operação N vezes em série (padrão 1.000, com aquecimento
-descartado) e imprime o tempo médio, as operações por segundo e o ambiente da medição. Ele recusa
-rodar fora de `NODE_ENV=test` e contra banco que não seja local.
+> No PowerShell, as variáveis vão antes, em linhas separadas:
+> `$env:NODE_ENV="test"; $env:CACHE_ATIVO="true"; npm run medir`
 
-Resultado medido em 19/10/2026 (Windows, Docker Desktop, tudo na mesma máquina):
-**2,58 ms → 1,08 ms por operação, ganho de 2,4×**. O detalhe importante: desse 1,08 ms,
-**0,71 ms é round-trip de rede** — um `PING` ao Redis custa isso aqui, porque o Docker Desktop
-leva cada pacote por uma VM. Em Linux nativo o mesmo `PING` fica na casa de 0,03 ms, então 2,4× é
-o piso deste ambiente, não o teto da solução. Os números completos, com a conta do que isso
-representa numa turma de 40 estudantes, estão em
-[`docs/evidencias/2026-10-19-antes-e-depois-cache-redis.txt`](docs/evidencias/2026-10-19-antes-e-depois-cache-redis.txt).
+| | tempo por operação | operações por segundo |
+|---|---|---|
+| Sem cache (PostgreSQL) | 2,58 ms | 388 |
+| Com cache (Redis) | **1,08 ms** | **935** |
+| | **2,4× mais rápido** | |
 
-As variáveis (`CACHE_ATIVO`, `REDIS_URL`, TTL e tempos de espera) estão documentadas no
-`.env.example`.
+**Uma ressalva honesta sobre esse número.** Dos 1,08 ms da versão com cache, **0,71 ms é só ida e
+volta na rede** — é o que custa um simples `PING` ao Redis nesta máquina, porque o Docker Desktop
+no Windows leva cada pacote por dentro de uma máquina virtual. Em Linux o mesmo `PING` custa perto
+de 0,03 ms. Então **2,4× é o piso deste ambiente, não o limite da solução**: com a aplicação e o
+Redis no mesmo servidor Linux, o ganho seria bem maior. Não medimos isso porque não temos Linux
+aqui, e preferimos dizer o que dá para provar.
+
+As medições completas, com a saída literal dos comandos, estão em
+[`docs/evidencias/`](docs/evidencias/).
+
+---
 
 ## Testes
 
 ```bash
-cd backend
-npm test           # 431 testes (integração + unitários), ~7 min
-npm run test:unit  # só os unitários, sem banco, ~1 s
-
-cd ../frontend
-npm test           # 22 unitários
+npm test             # backend (485) + frontend (30)
+npm run lint         # análise estática nos dois
 ```
 
-Os testes rodam **sempre em um banco separado** (`DATABASE_URL_TESTE`) e apagam os dados dele a
-cada execução. O script recusa executar se `NODE_ENV` não for `test` ou se a URL de teste for
-igual à de desenvolvimento, e cria o banco de testes caso não exista. O banco de desenvolvimento
-nunca é tocado — há um teste (`tests/isolamento.test.js`) que verifica exatamente isso.
+Os testes nunca tocam o banco de desenvolvimento: eles usam um banco separado, apagam os dados
+dele a cada execução e se recusam a rodar se a configuração estiver errada.
 
-> Não rode `node --test` diretamente: sem `npm test` o ambiente de teste não é montado — e
-> entre o que ele monta está a trava que impede qualquer teste de sair para a internet.
+O cache entra **desligado** nos testes, de propósito — uma suíte não pode depender de um servidor
+externo estar no ar, nem mudar de resultado conforme a máquina. Os 8 testes da camada ligam o que
+precisam no próprio código, e os que exigem um Redis de verdade se marcam como pulados quando não
+há nenhum. Para rodar tudo contra um Redis real:
 
-Os testes do cache seguem a mesma disciplina: usam `REDIS_URL_TESTE` (banco lógico 9, separado do
-de desenvolvimento) e apagam só as chaves que eles próprios criam. Sem Redis no ar, os casos de
-HIT/MISS se declaram `skip` e os de degradação continuam rodando — são eles que garantem que a
-API não cai, nem fica lenta, quando o cache desaparece.
-
-Há também um teste de estresse por cenário (`npm run estresse`), que simula uma turma inteira
-fazendo a prova ao mesmo tempo, e análise estática nos dois pacotes (`npm run lint`).
-
-A verificação manual no navegador segue um roteiro próprio, que acompanha a monografia.
-
-## Estrutura
-
-```
-├── .env.example            variáveis de ambiente necessárias
-├── backend/
-│   ├── migrations/         001_schema_inicial.sql até 008_modelo_da_sugestao_ia.sql
-│   ├── scripts/            testar.js (banco de testes), migrate.js, estresse.js (carga),
-│   │                       medir.js (baseline de uma operação)
-│   ├── src/
-│   │   ├── config/ db/ middleware/ utils/
-│   │   ├── dominio/        funções puras (estatísticas, prazo) — a base dos testes unitários
-│   │   ├── servicos/       email.js, cache.js (Redis) e ia/ (um adaptador por provedor)
-│   │   └── modules/        auth, usuarios, questoes, avaliacoes, turmas, realizacao,
-│   │                       correcao, monitoramento, dashboard, resultados, saude
-│   └── tests/              integração + unitarios/ + ajuda/sem-rede.js (trava de rede)
-└── frontend/
-    ├── src/                api/ auth/ componentes/ paginas/ utils/ styles/
-    └── tests/              unitários das funções puras
+```bash
+CACHE_NOS_TESTES=true npm test
 ```
 
-Convenção do backend: um diretório por domínio, com `<modulo>.routes.js` e `<modulo>.service.js`.
+---
 
-## Banco de dados
+## Onde fica cada coisa
 
-- Migrações em `backend/migrations/NNN_descricao.sql`, aplicadas em ordem por `npm run migrate`
-  e registradas na tabela `schema_migrations`.
-- **Migração já aplicada nunca é editada**: para mudar o esquema, cria-se um arquivo novo.
-- Cada migração explica, no próprio arquivo, o que muda e por quê.
+```
+backend/
+  migrations/            o esquema do banco, um arquivo por mudança
+  scripts/               medir.js (mede uma operação), estresse.js (simula uma turma)
+  src/servicos/cache.js  a camada de cache
+  src/modules/           um diretório por assunto: rotas + regras de negócio
+  tests/
+frontend/
+  src/paginas/           uma por tela
+docs/evidencias/         as medições, com a saída literal dos comandos
+```
 
-## Documentação
+---
 
-A documentação de projeto — requisitos, arquitetura, modelo de dados, decisões técnicas e de
-negócio, histórico de implementação, roteiro de verificação manual e o mapa entre o documento
-de requisitos e o código — acompanha a monografia do Trabalho Final de Curso e **não é
-versionada** neste repositório, por decisão do autor.
+## Equipe
 
-O que fica aqui, junto do código, são os comentários: cada decisão não óbvia está explicada no
-arquivo em que ela vive.
+Julio Cezar Rodrigues Correia · Eduardo Machado Martins · Thiago Santana de Andrade
 
-## Solução de problemas
-
-| Sintoma | Causa provável |
-|---|---|
-| "Variável de ambiente obrigatória ausente: JWT_SECRET" | Falta `JWT_SECRET` no `.env` (não há valor padrão, por segurança) |
-| `npm test` aborta com "DATABASE_URL_TESTE aponta para o MESMO banco" | As duas URLs apontam para o mesmo banco; use um banco dedicado aos testes |
-| `npm test` aborta ao criar o banco de testes | Conceda `ALTER ROLE <usuario> CREATEDB;` ou crie o banco à mão |
-| Nenhum e-mail chega na recuperação de senha | Comportamento esperado sem `SMTP_HOST`: o link sai no log da API |
-| HTTP 429 ao entrar | Proteção contra abuso; aguarde alguns minutos |
-| `EADDRINUSE` | Outro processo usa a porta 3000, 5173 ou 5432 |
-| A sugestão da IA aparece como "simulada" | Falta `IA_PROVEDOR` ou `IA_API_KEY` no `.env`. Confira em `GET /api/correcao/ia/estado`, que informa provedor e modelo sem revelar a chave |
-| "Não foi possível obter a sugestão da Inteligência Artificial agora" | O log da API traz o motivo informado pelo provedor. O mais comum é nome de modelo descontinuado, que responde 404 mesmo continuando listado na conta |
-
-## Licença e uso
-
-Projeto acadêmico, desenvolvido como Trabalho Final de Curso. O código está publicado para fins
-de avaliação e consulta.
+ESW441 — Prof. Gustavo Martins Lima
