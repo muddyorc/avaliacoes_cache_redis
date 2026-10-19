@@ -1,0 +1,87 @@
+BASELINE DO PONTO DE DOR - questoesDaProva (realizacao.service.js)
+Projeto N2, Semana 1 - o "antes", medido ANTES de a camada de cache existir
+Data: 2026-10-19
+Commit: 35dfcb6 Sistema de avaliacoes digitais: base do projeto de cache
+
+OPERACAO MEDIDA
+  questoesDaProva(executor, avaliacaoId) - as 3 consultas que carregam a estrutura da
+  prova (enunciados, alternativas e pontuacoes, como o estudante as ve).
+
+POR QUE ESTA OPERACAO
+  - O salvamento automatico a executa a cada 10 s por estudante (UC09), e ela tambem
+    roda ao abrir e ao retomar a prova. E a leitura mais repetida do sistema.
+  - Numa prova congelada o resultado e IMUTAVEL: depois que o primeiro estudante inicia,
+    a prova guarda a propria copia das questoes e nada mais escreve nela. Candidata
+    natural a cache, com invalidacao trivial.
+  - NAO foi escolhido o login, que e a operacao mais lenta do teste de estresse
+    (2790 ms com 30 alunos): a lentidao dele e o bcrypt com custo 10, que e proposital.
+    Cache de verificacao de senha e regressao de seguranca, nao otimizacao.
+
+METODO
+  N chamadas em serie, sem rede e sem concorrencia, com 100 chamadas de aquecimento
+  descartadas (as primeiras pagam JIT, primeiro plano de consulta e cache frio do
+  PostgreSQL - medir isso junto mediria a partida, nao a operacao).
+  Media = tempo total / N.
+
+  $ cd backend
+  $ NODE_ENV=test CACHE_ATIVO=false npm run medir -- --n=1000
+
+  CACHE_ATIVO=false e explicito: a partir de 19/10/2026 o codigo tem a camada de cache,
+  e este numero e o "antes". Com CACHE_ATIVO=true o mesmo comando mede o "depois".
+
+AMBIENTE
+  PostgreSQL 18.6 local, banco avaliacoes_redis_teste
+  Node v24.21.0
+  Windows_NT 10.0.19045 (win32/x64)
+  Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz - 12 nucleos logicos
+  15.9 GiB de RAM
+  API e banco no mesmo computador
+
+CENARIO
+  40 questoes x 5 alternativas = 200 alternativas
+  prova congelada (le avaliacao_alternativa)
+  3 consultas por operacao
+
+RESULTADO - saida literal das duas execucoes
+
+=====================================================================
+$ NODE_ENV=test CACHE_ATIVO=false node scripts/medir.js --n=1000
+
+[medir] banco: localhost:5432/avaliacoes_redis_teste
+[medir] semeando prova com 40 questoes x 5 alternativas...
+[medir] aquecendo (100 chamadas, descartadas)...
+[medir] medindo 1000 chamadas...
+
++-- BASELINE: questoesDaProva (realizacao.service.js) --------------------
+|  N (repeticoes medidas)    1000
+|  aquecimento descartado    100
+|  tempo total               2518.56 ms
+|  tempo medio por operacao  2.5186 ms
+|  operacoes por segundo     397.1
++------------------------------------------------------------------------
+
+=====================================================================
+$ NODE_ENV=test CACHE_ATIVO=false node scripts/medir.js --n=1000   (repeticao)
+
++-- BASELINE: questoesDaProva (realizacao.service.js) --------------------
+|  N (repeticoes medidas)    1000
+|  aquecimento descartado    100
+|  tempo total               2636.40 ms
+|  tempo medio por operacao  2.6364 ms
+|  operacoes por segundo     379.3
++------------------------------------------------------------------------
+
+=====================================================================
+NUMERO DO BASELINE
+
+  2,52 a 2,64 ms por operacao  (duas execucoes de N=1000)
+  379 a 397 operacoes por segundo
+
+  A variacao entre execucoes e de ~5%, o que da a margem com que o "depois" deve ser
+  comparado: ganho abaixo disso nao e ganho, e ruido.
+
+OBSERVACAO HONESTA SOBRE A ESCALA
+  2,5 ms nao e "lento" em absoluto. O argumento desta entrega e frequencia x repeticao:
+  a operacao roda a cada 10 s por estudante durante toda a prova. O piso do ganho com
+  Redis local nao e zero, e o round-trip do socket TCP - algo entre 0,1 e 0,3 ms nesta
+  maquina. E ganho de uma ordem de grandeza, nao de tres.

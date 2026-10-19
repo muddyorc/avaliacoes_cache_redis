@@ -29,6 +29,7 @@ import os from 'node:os';
 import { readFile } from 'node:fs/promises';
 import { pool, query } from '../src/db/pool.js';
 import { env } from '../src/config/env.js';
+import { encerrar as encerrarCache } from '../src/servicos/cache.js';
 
 // ----------------------------------------------------------------------- travas
 
@@ -220,4 +221,12 @@ principal()
     console.error('[medir] falhou:', erro);
     process.exitCode = 1;
   })
-  .finally(() => pool.end());
+  // Fecha o pool E o cache. O segundo não é zelo: a conexão do Redis é um socket aberto
+  // e, enquanto ela viver, o event loop tem trabalho pendente e o processo NÃO encerra
+  // sozinho. Medindo com CACHE_ATIVO=true, o script imprimia o resultado e ficava
+  // pendurado para sempre. A API não sofre disso porque é um servidor — ela não deveria
+  // mesmo terminar —, mas todo script que usa a camada precisa desta linha.
+  .finally(async () => {
+    await encerrarCache();
+    await pool.end();
+  });

@@ -1,0 +1,102 @@
+ANTES E DEPOIS - CAMADA DE CACHE EM REDIS
+Projeto N2 - operacao: questoesDaProva (realizacao.service.js)
+Data: 2026-10-19
+
+MESMO COMANDO, MESMA MAQUINA, MESMO CENARIO. A unica diferenca entre as duas colunas e
+a variavel CACHE_ATIVO. Isso e proposital: comparar dois programas diferentes nao prova
+nada sobre a camada.
+
+  $ cd backend
+  $ NODE_ENV=test CACHE_ATIVO=false npm run medir -- --n=1000   # antes
+  $ NODE_ENV=test CACHE_ATIVO=true  npm run medir -- --n=1000   # depois
+
+AMBIENTE
+  PostgreSQL 18.6 local (banco avaliacoes_redis_teste)
+  Redis 7.4.11 em container Docker: docker run -d --name redis -p 6379:6379 redis:7
+  Node v24.21.0
+  Windows_NT 10.0.19045 (win32/x64)
+  Intel(R) Xeon(R) CPU E5-2620 v3 @ 2.40GHz - 12 nucleos logicos, 15.9 GiB
+  Tudo na mesma maquina.
+
+CENARIO
+  40 questoes x 5 alternativas = 200 alternativas, prova congelada.
+  N = 1000 chamadas em serie, 100 de aquecimento descartadas.
+  No "depois", as 1000 chamadas medidas sao todas HIT: o MISS acontece no aquecimento.
+
+=====================================================================
+RESULTADO
+
+                            execucao 1    execucao 2      media
+  ANTES  (PostgreSQL)        2.5186 ms     2.6364 ms     2.5775 ms
+         operacoes/s            397.1         379.3         388.2
+
+  DEPOIS (Redis, HIT)        0.9599 ms     1.2084 ms     1.0842 ms
+         operacoes/s           1041.8         827.5         934.7
+
+  GANHO                                                   2.38x
+  REDUCAO DO TEMPO                                        57.9%
+
+  A variacao entre execucoes do mesmo cenario e de ~5% a ~12%, entao o ganho de 2.4x
+  esta muito acima do ruido.
+
+=====================================================================
+ONDE O TEMPO VAI PARAR NO "DEPOIS" - a parte honesta
+
+O ganho foi de 2.4x, nao de 10x. A razao nao e o Redis nem o codigo da camada: e o
+transporte. Medido nesta mesma maquina, com o mesmo cliente:
+
+  PING (so ida e volta, sem payload)  : 0.7149 ms
+  GET de um valor de 12 KB            : 0.8607 ms
+  operacao completa com cache         : ~1.0842 ms
+
+Dos ~1.08 ms da operacao cacheada, 0.71 ms e round-trip de rede. O que a aplicacao
+gasta por cima disso - desserializar o JSON da estrutura e montar a resposta - e algo
+como 0.2 a 0.35 ms.
+
+O custo de 0.71 ms para um PING em localhost e alto: em Linux nativo esse numero fica
+na casa de 0.03 a 0.05 ms. A diferenca e o proxy de portas do Docker Desktop no
+Windows, que leva cada pacote por uma maquina virtual (WSL2) antes de chegar ao
+container.
+
+CONSEQUENCIA PRATICA: 2.4x e o PISO imposto por este ambiente de desenvolvimento, nao o
+teto da solucao. Com a aplicacao e o Redis no mesmo host Linux - que e como isso roda em
+producao - o HIT ficaria na casa de 0.1 a 0.3 ms, e o ganho sobre os 2.58 ms do
+PostgreSQL seria de uma ordem de grandeza. Medir isso exigiria um ambiente Linux, que
+nao existe nesta maquina; por isso o numero acima e o que se pode AFIRMAR, e o resto
+fica como expectativa declarada, nao como resultado.
+
+=====================================================================
+O QUE O GANHO SIGNIFICA NO USO REAL
+
+A operacao roda a cada 10 s por estudante durante toda a prova, em toda retomada de tela
+e em todo salvamento automatico. Numa turma de 40 estudantes numa prova de 1 hora:
+
+  40 estudantes x 360 salvamentos (1h / 10s) = 14.400 execucoes
+  antes : 14.400 x 2.5775 ms = 37.1 s de banco
+  depois: 14.400 x 1.0842 ms = 15.6 s
+  economia: 21.5 s de trabalho do PostgreSQL por prova, e 3 consultas x 14.400 =
+            43.200 consultas que deixam de existir.
+
+O valor nao esta em o estudante esperar 1.5 ms a menos numa chamada - isso ninguem
+percebe. Esta em tirar 43.200 consultas do banco durante a hora em que a turma inteira
+esta usando o sistema ao mesmo tempo, que e exatamente o momento em que ele tem menos
+folga.
+
+=====================================================================
+CHAVE CRIADA (conferida apos a medicao)
+
+  $ docker exec redis redis-cli -n 0 KEYS "prova:*"
+  prova:v1:2:estrutura
+  prova:v1:3:estrutura
+
+  $ TTL -> 21596 s restantes (de 21600 = 6 h)
+
+=====================================================================
+VERIFICACAO AUTOMATIZADA NA MESMA DATA
+
+  $ npm --prefix backend test
+  tests 485 | pass 485 | fail 0 | skipped 0 | duration_ms 521220
+
+  Inclui 8 casos novos da camada (tests/cache.test.js): HIT, MISS, o conteudo do cache
+  sendo de fato o que a prova devolve, a prova nao congelada ficando de fora, a guarda
+  que impede cachear antes do COMMIT, e a degradacao com o Redis fora do ar.

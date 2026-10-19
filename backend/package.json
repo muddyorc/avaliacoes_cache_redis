@@ -17,7 +17,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test:unit": "node --test --import ./tests/ajuda/sem-rede.js \"tests/unitarios/*.test.js\"",
-    "estresse": "node scripts/estresse.js"
+    "estresse": "node scripts/estresse.js",
+    "medir": "node scripts/medir.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -27,6 +28,7 @@
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^10.0.10",
     "pg": "^8.23.0",
+    "redis": "^6.3.0",
     "zod": "^4.6.5"
   },
   "devDependencies": {

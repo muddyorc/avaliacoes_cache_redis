@@ -47,6 +47,25 @@ export const env = {
   // Validade do link de redefinição de senha: 1 h (PROJECT_CONTEXT §3.2).
   redefinicaoSegundos: Number(process.env.REDEFINICAO_SEGUNDOS || 60 * 60),
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
+  // Cache de leitura em Redis (Projeto N2). Camada OPCIONAL: sem Redis no ar o sistema
+  // funciona igual, lendo tudo do PostgreSQL — só mais devagar. Nada aqui é obrigatório.
+  cache: {
+    // Desligado em teste por padrão. As suítes não podem depender de um servidor externo
+    // estar no ar; os testes do cache ligam a chave explicitamente quando precisam dele.
+    ativo: process.env.CACHE_ATIVO ? process.env.CACHE_ATIVO !== 'false' : !emTeste,
+    url: process.env.REDIS_URL || 'redis://localhost:6379',
+    // 6 h. A estrutura congelada é imutável, então o TTL não existe para evitar dado
+    // velho: existe para a chave não ocupar memória para sempre depois que a prova
+    // terminou. É a "rede de segurança" da modelagem, não o mecanismo principal.
+    ttlEstruturaSegundos: Number(process.env.CACHE_TTL_ESTRUTURA_SEGUNDOS || 6 * 60 * 60),
+    // Espera curta de propósito: o cache é um atalho. A operação que ele evita custa
+    // ~2,5 ms no banco local, então esperar muito por ele seria pior que não usá-lo.
+    esperaConexaoMs: Number(process.env.CACHE_ESPERA_CONEXAO_MS || 1000),
+    // Depois de uma falha, nem tenta o Redis por este tempo. Sem essa pausa, com o Redis
+    // fora do ar TODA requisição pagaria o tempo de conexão acima, e a camada passaria
+    // de atalho a imposto — o modo de falha mais cruel, porque parece estar funcionando.
+    esperaAposFalhaMs: Number(process.env.CACHE_ESPERA_APOS_FALHA_MS || 30_000),
+  },
   admin: {
     nome: process.env.ADMIN_NOME || 'Administrador',
     email: process.env.ADMIN_EMAIL || '',

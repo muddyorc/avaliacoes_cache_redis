@@ -15,6 +15,8 @@ import { query, transacao } from '../../db/pool.js';
 import { ErroApp } from '../../middleware/erros.js';
 import { prazoFinalDaProva } from '../../dominio/prazo.js';
 import { corrigirObjetivas, materializarAusentesDaAvaliacao, recalcularTentativa } from '../correcao/correcao.service.js';
+import { buscar, guardar } from '../../servicos/cache.js';
+import { env } from '../../config/env.js';
 
 const NAO_DISPONIVEL = 'Avaliação não encontrada ou não disponível para você.';
 
@@ -218,8 +220,35 @@ export async function congelarQuestoes(client, avaliacaoId) {
 
 // ------------------------------------------------------------- questões e respostas
 
+// Chave da estrutura da prova no cache (Projeto N2, semana 2).
+//
+// O `v1` não é enfeite: se o formato deste JSON mudar, basta subir para `v2` e as chaves
+// antigas morrem de TTL sozinhas. Sem a versão, uma mudança de formato exigiria limpar o
+// Redis na hora da publicação, ou a tela receberia um objeto com o desenho velho.
+export const chaveDaEstrutura = (avaliacaoId) => `prova:v1:${avaliacaoId}:estrutura`;
+
 // As questões como o estudante as vê: sem `correta`, sem resposta esperada, sem critérios.
-async function questoesDaProva(executor, avaliacaoId) {
+//
+// É a operação medida como baseline (`scripts/medir.js`): 3 consultas, ~2,5 ms, e o
+// salvamento automático a executa a cada 10 s por estudante. Daí o cache-aside abaixo.
+//
+// `podeGuardar` existe por um motivo específico, não por simetria: quem chama de DENTRO
+// da transação que acabou de congelar a prova ainda não comitou nada. Guardar ali deixaria
+// no Redis, por 6 h, uma estrutura que um ROLLBACK apagou do banco — um fantasma que
+// nenhuma invalidação prevê, porque a prova "nunca existiu". Essa chamada passa `false`;
+// a estrutura entra no cache na leitura seguinte, 10 s depois, já comitada.
+async function questoesDaProva(executor, avaliacaoId, { podeGuardar = true } = {}) {
+  const chave = chaveDaEstrutura(avaliacaoId);
+  const guardado = await buscar(chave);
+  // HIT: zero consultas ao PostgreSQL.
+  //
+  // A conferência de formato não é desconfiança do próprio código: o Redis é estado
+  // compartilhado, fora da transação e fora do controle da aplicação. Um `[]` seria
+  // VERDADEIRO num `if` simples e devolveria uma prova sem questões; um objeto no lugar
+  // da lista quebraria o `.map` de quem chamou. Formato inesperado é tratado como MISS,
+  // e a fonte da verdade resolve.
+  if (Array.isArray(guardado) && guardado.length > 0) return guardado;
+
   // Depois do congelamento vale a cópia da prova; antes, o banco de questões — é o caso
   // do modo teste do professor (P-20), que roda em avaliação que ninguém iniciou.
   const { rows: questoes } = await executor.query(
@@ -247,7 +276,7 @@ async function questoesDaProva(executor, avaliacaoId) {
   );
   const alternativas = [...congeladas, ...doBanco];
 
-  return questoes.map((q) => ({
+  const estrutura = questoes.map((q) => ({
     questaoId: q.questao_id,
     ordem: q.ordem,
     tipo: q.tipo,
@@ -266,6 +295,27 @@ async function questoesDaProva(executor, avaliacaoId) {
       .sort((a, b) => a.ordem - b.ordem)
       .map((a) => ({ id: a.id, ordem: a.ordem, texto: a.texto, origemId: a.origem_id })),
   }));
+
+  // MISS: guarda, mas SÓ prova congelada.
+  //
+  // Esta é a condição que torna a chave dispensável de invalidação. Depois do
+  // congelamento nada mais escreve nestas tabelas — `exigirEditavel` barra em
+  // `total_tentativas > 0` (avaliacoes.service.js), e `editarQuestaoDaProva` tem uma
+  // segunda trava conferindo `congelada_em`. Logo, o valor guardado é imutável e o TTL é
+  // só economia de memória.
+  //
+  // Antes do congelamento é o oposto: a estrutura vem do banco de questões e o professor
+  // pode editá-la à vontade (modo teste, P-20). Cachear ali exigiria invalidar em toda
+  // edição de questão, arrastando o módulo `questoes` inteiro para dentro do problema —
+  // por um ganho que não existe, porque ninguém fica recarregando o modo teste de 10 em
+  // 10 segundos.
+  //
+  // O `length > 0` não é zelo excessivo: `[].every(...)` é `true`, e sem ele uma
+  // avaliação sem nenhuma questão entraria no cache como se fosse congelada.
+  if (podeGuardar && estrutura.length > 0 && estrutura.every((q) => q.congelada)) {
+    await guardar(chave, estrutura, env.cache.ttlEstruturaSegundos);
+  }
+  return estrutura;
 }
 
 // A fronteira da trava: o instante a partir do qual as respostas ainda podem mudar.
@@ -315,11 +365,11 @@ async function respostasSalvas(executor, tentativaId) {
 
 // Estado completo da prova em andamento (ou encerrada), incluindo a hora do servidor
 // para o cronômetro da tela se orientar sem depender do relógio do computador.
-async function estadoDaTentativa(executor, linha, avaliacaoId) {
+async function estadoDaTentativa(executor, linha, avaliacaoId, { podeGuardar = true } = {}) {
   const agora = new Date();
   return {
     avaliacao: formatar(linha, agora),
-    questoes: await questoesDaProva(executor, avaliacaoId),
+    questoes: await questoesDaProva(executor, avaliacaoId, { podeGuardar }),
     respostas: linha.tentativa_id ? await respostasSalvas(executor, linha.tentativa_id) : [],
     horaServidor: agora.toISOString(),
   };
@@ -402,7 +452,15 @@ export async function iniciar(avaliacaoId, estudanteId) {
       throw erro;
     }
 
-    return estadoDaTentativa(client, { ...linha, tentativa_id: tentativa, tentativa_status: 'EM_ANDAMENTO', iniciada_em: agora, prazo_final: prazoFinal }, avaliacaoId);
+    // `podeGuardar: false`: o congelamento acima ainda não foi comitado. Ver a explicação
+    // em `questoesDaProva` — cachear aqui arriscaria guardar uma prova que o ROLLBACK
+    // desfez. A primeira leitura depois do COMMIT popula a chave.
+    return estadoDaTentativa(
+      client,
+      { ...linha, tentativa_id: tentativa, tentativa_status: 'EM_ANDAMENTO', iniciada_em: agora, prazo_final: prazoFinal },
+      avaliacaoId,
+      { podeGuardar: false },
+    );
   });
 }
 

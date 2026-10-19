@@ -200,6 +200,49 @@ npm run dev        # http://localhost:5173
 Abra http://localhost:5173 e entre com o administrador definido no `.env`. Por ele, cadastre um
 professor; o estudante pode criar a própria conta pelo link **Criar conta**.
 
+### 4. Cache de leitura em Redis (opcional)
+
+**O sistema funciona sem Redis.** Sem servidor no ar, a API lê tudo do PostgreSQL, avisa uma vez
+no log e segue — nenhuma tela muda de comportamento. Para ligar a camada:
+
+```bash
+docker run -d --name redis -p 6379:6379 redis:7
+docker exec -it redis redis-cli     # PING deve responder PONG
+```
+
+O que é cacheado: a **estrutura da prova** (enunciados, alternativas e pontuações como o
+estudante as vê), na chave `prova:v1:{avaliacaoId}:estrutura`, em JSON, com validade de 6 h.
+
+Por que essa operação: é a que o salvamento automático executa a cada 10 s por estudante, e
+numa prova **congelada** o resultado é imutável — depois que o primeiro estudante inicia, a prova
+guarda a própria cópia das questões e nada mais escreve nela (`exigirEditavel` barra edição com
+tentativas existentes). Por isso a chave **não precisa de invalidação**: o TTL existe só para não
+ocupar memória para sempre. Prova ainda **não congelada** não entra no cache, porque aí a
+estrutura acompanha o banco de questões e pode mudar a qualquer momento.
+
+Medindo o antes e o depois com o mesmo comando:
+
+```bash
+cd backend
+NODE_ENV=test CACHE_ATIVO=false npm run medir    # baseline: lê sempre do PostgreSQL
+NODE_ENV=test CACHE_ATIVO=true  npm run medir    # com a camada no ar
+```
+
+O `scripts/medir.js` chama uma única operação N vezes em série (padrão 1.000, com aquecimento
+descartado) e imprime o tempo médio, as operações por segundo e o ambiente da medição. Ele recusa
+rodar fora de `NODE_ENV=test` e contra banco que não seja local.
+
+Resultado medido em 19/10/2026 (Windows, Docker Desktop, tudo na mesma máquina):
+**2,58 ms → 1,08 ms por operação, ganho de 2,4×**. O detalhe importante: desse 1,08 ms,
+**0,71 ms é round-trip de rede** — um `PING` ao Redis custa isso aqui, porque o Docker Desktop
+leva cada pacote por uma VM. Em Linux nativo o mesmo `PING` fica na casa de 0,03 ms, então 2,4× é
+o piso deste ambiente, não o teto da solução. Os números completos, com a conta do que isso
+representa numa turma de 40 estudantes, estão em
+[`docs/evidencias/2026-10-19-antes-e-depois-cache-redis.txt`](docs/evidencias/2026-10-19-antes-e-depois-cache-redis.txt).
+
+As variáveis (`CACHE_ATIVO`, `REDIS_URL`, TTL e tempos de espera) estão documentadas no
+`.env.example`.
+
 ## Testes
 
 ```bash
@@ -219,6 +262,11 @@ nunca é tocado — há um teste (`tests/isolamento.test.js`) que verifica exata
 > Não rode `node --test` diretamente: sem `npm test` o ambiente de teste não é montado — e
 > entre o que ele monta está a trava que impede qualquer teste de sair para a internet.
 
+Os testes do cache seguem a mesma disciplina: usam `REDIS_URL_TESTE` (banco lógico 9, separado do
+de desenvolvimento) e apagam só as chaves que eles próprios criam. Sem Redis no ar, os casos de
+HIT/MISS se declaram `skip` e os de degradação continuam rodando — são eles que garantem que a
+API não cai, nem fica lenta, quando o cache desaparece.
+
 Há também um teste de estresse por cenário (`npm run estresse`), que simula uma turma inteira
 fazendo a prova ao mesmo tempo, e análise estática nos dois pacotes (`npm run lint`).
 
@@ -230,11 +278,12 @@ A verificação manual no navegador segue um roteiro próprio, que acompanha a m
 ├── .env.example            variáveis de ambiente necessárias
 ├── backend/
 │   ├── migrations/         001_schema_inicial.sql até 008_modelo_da_sugestao_ia.sql
-│   ├── scripts/            testar.js (prepara o banco de testes), migrate.js, estresse.js
+│   ├── scripts/            testar.js (banco de testes), migrate.js, estresse.js (carga),
+│   │                       medir.js (baseline de uma operação)
 │   ├── src/
 │   │   ├── config/ db/ middleware/ utils/
 │   │   ├── dominio/        funções puras (estatísticas, prazo) — a base dos testes unitários
-│   │   ├── servicos/       email.js e ia/ (um adaptador por provedor + o prompt)
+│   │   ├── servicos/       email.js, cache.js (Redis) e ia/ (um adaptador por provedor)
 │   │   └── modules/        auth, usuarios, questoes, avaliacoes, turmas, realizacao,
 │   │                       correcao, monitoramento, dashboard, resultados, saude
 │   └── tests/              integração + unitarios/ + ajuda/sem-rede.js (trava de rede)

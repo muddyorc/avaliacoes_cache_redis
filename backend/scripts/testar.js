@@ -90,7 +90,22 @@ const filho = spawn(
   ],
   {
     stdio: 'inherit',
-    env: { ...process.env, NODE_ENV: 'test' },
+    env: {
+      ...process.env,
+      NODE_ENV: 'test',
+      // Cache DESLIGADO na suíte, mesmo que o .env de quem roda diga CACHE_ATIVO=true.
+      //
+      // Duas razões. A suíte não pode depender de um servidor externo estar no ar — é a
+      // mesma disciplina do banco de teste logo acima. E ela não pode mudar de
+      // comportamento conforme a máquina: com o cache ligado, as asserções passariam a
+      // exercitar o caminho do Redis em umas máquinas e o do PostgreSQL em outras, e
+      // "passou aqui" deixaria de significar alguma coisa.
+      //
+      // Os casos que precisam do cache o ligam em código (tests/cache.test.js), que é
+      // onde a dependência fica explícita. Para uma execução integrada, com Redis de
+      // verdade em toda a suíte: CACHE_NOS_TESTES=true npm test.
+      CACHE_ATIVO: process.env.CACHE_NOS_TESTES === 'true' ? 'true' : 'false',
+    },
     cwd: fileURLToPath(new URL('..', import.meta.url)),
   },
 );
